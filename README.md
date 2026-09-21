@@ -1,46 +1,90 @@
-# Appunti Performance Evaluation of Computer Systems and Networks A.A. 2026-2027
+# Notes for Performance Evaluation of Computer Systems A.Y. 2026-2027
 
-Questi sono gli appunti del corso Performance Evaluation of Computer Systems and Networks di 2026-2027 dell'Università di Pisa.
-Per una visualizzazione ottimale con formattazione completa, rendering delle formule matematiche e funzionamento dei link di navigazione, si consiglia di consultare la versione online disponibile su [GitHub Pages](https://gabriele-d-cambria.github.io/Appunti-Performance-Evaluation-of-Computer-Systems-and-Networks-2026-2027/).
+These are _Performance Evaluation of Computer Systems_
+_2026-2027_ course from University of Pisa.
+For an optimal visualization, styling, math formulas rendering
+and navigation links, consult the online version available at
+[GitHub Pages](https://gabriele-d-cambria.github.io/Notes-for-Performance-Evaluation-of-Computer-Systems-2026-2027).
 
-## 📚 Informazioni sul Corso
+## 📚 Course Informations
 
-**Docenti:**
+**Professors:**
 
-- **Luca Fanucci**
-- **Marco Moretti**
-- **Pietro Nannipieri**
+- **Giovanni Stea**
+  - _Consulting hours_: Tuesday morning - 8:30-11:30 (write an email beforehand)
 
-**Ricevimento:**
+- **Giovanni Nardini**
 
-**Bibliografia:**
+**Bibliography:**
 
-**Orario:**
+- Prof. Stea's notes
 
-- Lunedì: 11:30-13:30 - 14:30-17:30
-- Giovedì: 13:30-16:30
-- Venerdì: 15:30-18:30
+- S.M. Ross - Introductions to probability and statistics for engineers and scientists
 
-## 📋 Modalità d'Esame
+- R. Jain - The Art of Computer Systems performance analysis
 
-## 🎯 Struttura del Corso
+- J. Y. Le Boulec (download from its website)
 
-## Laboratorio
+**Lessons:**
 
-## 📖 Ordine di Studio Teoria Consigliato
+- Monday: 11:30-13:30 - 14:30 - 17:30
+- Tuesday: 13:30 - 16:30
+- Friday: 15:30 - 18:30
+
+## 📋 Exam
+
+It's a three step exam:
+
+1. **Group Project**: 3 people groups. Construct a software system on which we will make discussions (around 30 minuts) and experiments. The given project _**will not be changed**_. It has to have a small documentation and a presentation (not necessarily in English)
+
+2. **Written Exam**: 2 hours
+
+3. **Oral Exam**: the question will be given out on paper
+
+The Project must be done **before** the oral exams. The Written and the Oral exam are to be done in the same _appello_. At the end of the oral we will be given a final grade which is the average of all the single grades.
+
+## 🎯 Course Structure
+
+The main goals of this course are:
+
+- Probability Theory, Statistics and Experimental Designs (Stea)
+
+- Model: Software Simulations
+
+- Model: Analytical Set of Equations (Markov Chains)
+
+Requirements for the course are:
+
+- **Math**: algebra, set-theory, calculus, matrix algebra
+
+- **Coding**: C++
+
+## Lab
+
+## 📖 Suggested Study Order
+
+1. [Probability](./Probability)
 
 ## 📜 Disclaimer
 
-Questi appunti sono personali e destinati esclusivamente all'uso didattico.
+These are personal notes, and are to be used for educational purpose only.
 
-Fanno riferimento alle lezioni del corso di Performance Evaluation of Computer Systems and Networks  A.A. 2026-2027, tenute dal Prof. Luca Fanucci, dal Prof. Marco Moretti e dal Prof. Pietro Nannipieri e al materiale fornito dai professori e reperibile sul teams del corso.
-Non garantisco la loro correttezza, completezza o aggiornamento.
-Questi appunti non sono ufficiali e non sostituiscono le lezioni o il materiale didattico fornito dal professore.
+The notes are based on Performance Evaluation of Computer Systems A.Y.
+2026-2027 lessons, teached by Prof. Giovanni Stea and Prof. Giovanni
+Nardini, and on the notes handed by the professors and available on
+the official temas and course website.
+I do not grant accuracy, completeness or updating.
+These are not official notes, and don't replace lessons or official educational
+material handed by the professors.
+didattico fornito dal professore.
 
-Per qualsiasi dubbio fare sempre riferimento al materiale ufficiale del corso e alle indicazioni del docente.
+For any doubt, refer to official course material and professors instructions.
+alle indicazioni del docente.
 
-Nel caso di errori o imprecisioni, si prega di segnalare tramite issue su GitHub o contattando direttamente l'autore.
+If you spot errors, you can report them either by GitHub issue or by contacting
+the author directly.
 
-## 📄 Licenza
+## 📄 License
 
-Questo materiale è protetto da copyright. Vedere il file [LICENSE](./LICENSE) per i dettagli.
+This work is protected by copyright.
+Se [LICENSE](./LICENSE) for further details.
