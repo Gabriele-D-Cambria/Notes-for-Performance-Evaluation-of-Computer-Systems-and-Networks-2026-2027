@@ -35,13 +35,18 @@ and navigation links, consult the online version available at
 
 It's a three step exam:
 
-1. **Group Project**: 3 people groups. Construct a software system on which we will make discussions (around 30 minuts) and experiments. The given project _**will not be changed**_. It has to have a small documentation and a presentation (not necessarily in English)
+1. **Group Project**: 3 people groups. Construct a software system on which we
+   will make discussions (around 30 minutes) and experiments. The given project
+   _**will not be changed**_. It has to have a small documentation and a
+   presentation (not necessarily in English)
 
 2. **Written Exam**: 2 hours
 
 3. **Oral Exam**: the question will be given out on paper
 
-The Project must be done **before** the oral exams. The Written and the Oral exam are to be done in the same _appello_. At the end of the oral we will be given a final grade which is the average of all the single grades.
+The Project must be done **before** the oral exams. The Written and the Oral
+exam are to be done in the same _appello_. At the end of the oral we will be
+given a final grade which is the average of all the single grades.
 
 ## 🎯 Course Structure
 
@@ -63,7 +68,13 @@ Requirements for the course are:
 
 ## 📖 Suggested Study Order
 
+### Theory (Stea)
+
 1. [Probability](./Probability)
+
+### Simulations (Nardini)
+
+1. [System and Simulations](./System%20and%20Simulations)
 
 ## 📜 Disclaimer
 

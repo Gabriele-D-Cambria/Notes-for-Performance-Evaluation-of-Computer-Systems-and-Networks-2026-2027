@@ -6,17 +6,14 @@ title: Probability
 
 - [1. Indice](#1-indice)
 - [2. Probability](#2-probability)
-- [3. Probability](#3-probability)
-  - [3.1. Random Experiments](#31-random-experiments)
-  - [3.2. Axioms of Probability](#32-axioms-of-probability)
-    - [3.2.1. Example](#321-example)
-  - [3.3. Uniform Probability Model](#33-uniform-probability-model)
-    - [3.3.1. Basic Principle of Counting](#331-basic-principle-of-counting)
-      - [3.3.1.1. Example: Extracting Balls](#3311-example-extracting-balls)
+  - [2.1. Random Experiments](#21-random-experiments)
+  - [2.2. Axioms of Probability](#22-axioms-of-probability)
+    - [2.2.1. Example](#221-example)
+  - [2.3. Uniform Probability Model](#23-uniform-probability-model)
+    - [2.3.1. Basic Principle of Counting](#231-basic-principle-of-counting)
+      - [2.3.1.1. Example: Extracting Balls](#2311-example-extracting-balls)
 
 # 2. Probability
-
-# 3. Probability
 
 The definition of Probability has been discussed for long.
 
@@ -30,7 +27,7 @@ $$
 Solving an infinite limits is bothersome, so we will use some tricks like
 _symmetry_ to simplify many calculations.
 
-## 3.1. Random Experiments
+## 2.1. Random Experiments
 
 Some examples of random experiments are:
 
@@ -121,7 +118,7 @@ Two possible sets configurations.
 </div>
 </div>
 
-## 3.2. Axioms of Probability
+## 2.2. Axioms of Probability
 
 The axioms on which probability works on are:
 
@@ -137,7 +134,7 @@ Starting from these three axioms, we can derive a couple of _useful properties_:
 
 2. $P(E_1 \cup E_2) = P(E_1) + P(E_2) - P(E_1E_2)$
 
-### 3.2.1. Example
+### 2.2.1. Example
 
 Let's try to solve this problem:
 
@@ -172,7 +169,7 @@ $$
 
 Thus, we can say with certainty that $70\%$ of Americans are non-smokers.
 
-## 3.3. Uniform Probability Model
+## 2.3. Uniform Probability Model
 
 In many cases, the sample space of a random experiment has a **finite
 cardinality** $(N = \vert S\vert)$.
@@ -188,7 +185,7 @@ $$
 P(E) = \frac{\vert E\vert}{\vert S\vert}
 $$
 
-### 3.3.1. Basic Principle of Counting
+### 2.3.1. Basic Principle of Counting
 
 Given an experiment $C$ that is composed of two sub-experiments $C_1$ and $C_2$,
 having respectively $N_1$ and $N_2$ possible outcomes, the number of possible
@@ -201,7 +198,7 @@ $$
 \prod_{i=1}^k{N_i}
 $$
 
-#### 3.3.1.1. Example: Extracting Balls
+#### 2.3.1.1. Example: Extracting Balls
 
 > Take an _opaque_ (can't see inside) urn with 6 black balls and 5 white balls.
 > What is the probability that, extracting two **at random**
