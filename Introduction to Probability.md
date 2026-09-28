@@ -1,19 +1,35 @@
 ---
-title: Probability
+title: Introduction to Probability
 ---
 
 # 1. Index
 
 - [1. Index](#1-index)
-- [2. Probability](#2-probability)
+- [2. Introduction to Probability](#2-introduction-to-probability)
   - [2.1. Random Experiments](#21-random-experiments)
   - [2.2. Axioms of Probability](#22-axioms-of-probability)
     - [2.2.1. Example](#221-example)
   - [2.3. Uniform Probability Model](#23-uniform-probability-model)
     - [2.3.1. Basic Principle of Counting](#231-basic-principle-of-counting)
       - [2.3.1.1. Example: Extracting Balls](#2311-example-extracting-balls)
+    - [2.3.2. Example: Books](#232-example-books)
+  - [2.4. Binomial Coefficient](#24-binomial-coefficient)
+    - [2.4.1. Example: Boys and Girls](#241-example-boys-and-girls)
+    - [2.4.2. Example: Ordering People](#242-example-ordering-people)
+    - [2.4.3. Example: Basketball](#243-example-basketball)
+  - [2.5. Conditional Probability](#25-conditional-probability)
+  - [2.6. Law of Total Probability](#26-law-of-total-probability)
+    - [2.6.1. Example: Drivers and Accidents](#261-example-drivers-and-accidents)
+  - [2.7. Bayes' Theorem](#27-bayes-theorem)
+    - [2.7.1. Example: Lab Tests](#271-example-lab-tests)
+  - [2.8. Independence of Events](#28-independence-of-events)
+    - [2.8.1. Repeated Trials](#281-repeated-trials)
+      - [2.8.1.1. Exercise: Coin Tossing](#2811-exercise-coin-tossing)
+      - [2.8.1.2. Example: Keys and Doors](#2812-example-keys-and-doors)
+  - [2.9. Parallel Systems](#29-parallel-systems)
+    - [2.9.1. Example: Harder Systems](#291-example-harder-systems)
 
-# 2. Probability
+# 2. Introduction to Probability
 
 The definition of Probability has been discussed for long.
 
@@ -252,7 +268,7 @@ $$
   P(E) = \frac{\vert E \vert}{\vert S \vert} = \frac{60}{110} = \frac{6}{11}
 $$
 
-### Example: Books
+### 2.3.2. Example: Books
 
 > Suppose we have 10 books: 4 math books, 3 physics books, 2 informatics books
 > and 1 chemistry book. If we pick them at random, which is the probability of
@@ -272,7 +288,7 @@ $$
 P(E) = \frac{(4! \cdot 3! \cdot 2! \cdot 1!)\cdot 4!}{10!}
 $$
 
-## Binomial Coefficient
+## 2.4. Binomial Coefficient
 
 Suppose we have a set of $n$ elements. From this set we extract a subset of
 $k \le n$ elements.
@@ -300,7 +316,7 @@ Some useful properties of the binomial coefficient are:
 
 - $\binom{n}{1} = \binom{n-1}{k-1} + \binom{n-1}{k}$
 
-### Example: Boys and Girls
+### 2.4.1. Example: Boys and Girls
 
 > A group of 5 boys and 10 girls are lined up at random order.
 >
@@ -336,7 +352,7 @@ $$
   P(c) = \frac{1 \cdot 14!}{15!} = \frac{1}{15}
 $$
 
-### Example: Ordering People
+### 2.4.2. Example: Ordering People
 
 > We have $n$ persons and we want to form a line with $k \le n$ of them at
 > chosen random.
@@ -388,7 +404,7 @@ $$
 
 This function is indeed increasing, and goes from $0$ to $1$ as expected.
 
-### Example: Basketball
+### 2.4.3. Example: Basketball
 
 > A basketball team has 12 players, 6 black and 6 white.
 >
@@ -431,7 +447,7 @@ P(E) = \frac{\frac{6!}{2^3 \cdot 3!} \cdot \frac{6!}{2^3 \cdot
 3!}}{\frac{12!}{2^6 \cdot 6!}} = \frac{5}{33}
 $$
 
-## Conditional Probability
+## 2.5. Conditional Probability
 
 **Conditional probability** is the probability of an event $E$ given that another
 event $F$ has occurred: $P(E \vert F)$
@@ -483,7 +499,7 @@ $$
 \end{align*}
 $$
 
-## Law of Total Probability
+## 2.6. Law of Total Probability
 
 Using conditional probability, we can describe a general event $E$ in relation
 to another event $F$ as:
@@ -516,7 +532,7 @@ $$
 }
 $$
 
-### Example: Drivers and Accidents
+### 2.6.1. Example: Drivers and Accidents
 
 > A survey describes 2 classes of drivers: accident-prone $(30\%)$ and
 > non-accident-prone $(70\%)$.
@@ -544,7 +560,7 @@ $$
 P(A) = P(A \vert B) \cdot P(B) + P(A \vert B^C) \cdot P(B^C) = 26\%
 $$
 
-## Bayes' Theorem
+## 2.7. Bayes' Theorem
 
 The theorem is defined as:
 
@@ -555,3 +571,289 @@ The theorem is defined as:
 > $$
 >   P(F_j \vert E) = \frac{P(E\vert F_j)P(F_j)}{\sum_i^n{P(E\vert F_i)P(F_i)}}
 > $$
+
+### 2.7.1. Example: Lab Tests
+
+> A laboratory test to spot a blood disease is $99\%$ accurate for those who
+> are ill. However, these is a $1\%$ false positive rate.
+> Given that $0.5\%$ of the population has the disease, what is the probability
+> that you will have the disease if the test finds you positive?
+
+Calling $D$ the event _"the subject has the disease"_, and $P$ the event _"the
+test is positive"_, we have:
+
+- $P(P\vert D) = 0.99$
+- $P(P\vert D^C) = 0.01$
+- $P(D) = 0.005$
+
+Since $P(D)$ is a _priori probability_ that one has the disease, we want to compute
+$P(D|P)$, which is the _posteriori probability_.
+By Bayes' formula:
+
+$$
+\begin{align*}
+  P(D\vert P) &= \frac{P(P\vert D)P(D)}{P(P\vert D)P(D) + P(P\vert D^C)P(D^C)} \\
+  &= \frac{0.99\cdot 0.005}{0.99\cdot 0.005 + 0.01\cdot 0.995} \\
+  &\approx \frac{1}{3} \\
+\end{align*}
+$$
+
+Knowing that the event $P$ has occurred, **modifies my opinion** on the
+hypothesis $D$. Before running the test, we could only think that there was a
+$P(D) = 0.005$ that the next person had the disease, but after the test, we
+can say that the probability is $P(D|P) \approx 0.33 > P(D)$, increasing the
+confidence on the hypothesis of about 66 times.
+
+For the same reason, **if the body test is negative**, we can calculate the
+probability of not having the disease:
+
+$$
+\begin{align*}
+  P(D\vert P^C) &= \frac{P(P^C\vert D)P(D)}{1 - P(P)} \\
+  &= \frac{(1 - P(P\vert D))\cdot P(D)}{1 - P(P)} \\
+  &= \frac{(1 - 0.99)\cdot 0.005}{1 - (0.99\cdot 0.005 + 0.01\cdot 0.995)} \\
+  &= 5.07 \cdot 10^{-5} \\
+\end{align*}
+$$
+
+Meaning that, if the test finds someone negative, he only has one chance in
+$20.000$ of actually being ill.
+
+## 2.8. Independence of Events
+
+As we have seen, in general a **conditional probability** $P(E\vert F)$ is
+different from the _unconditional_ probability $P(E)$.
+
+In some case though, event $F$ could be **irrelevant**, meaning that the
+occurrence of $F$ doesn't change the probability of $E$.
+
+In this case we say that $E$ and $F$ are **independent events**:
+
+$$
+\begin{matrix}
+  P(EF) = P(E)P(F) & \Leftrightarrow & P(E\vert F) = P(E) \\
+\end{matrix}
+$$
+
+Some useful properties are:
+
+1. If $P(EF) = P(E)P(F)$, then $E$ also and $F^C$ are independent.
+2. If $P(EF) = P(E)P(F)$, then $E^C$ also and $F$ are independent.
+3. If $P(EF) = P(E)P(F)$, then $E^C$ also and $F^C$ are independent.
+4. If $P(EF) = P(E)P(F) = P(FE)$
+5. If $P(EF) = P(E)P(F),\;P(EG) = P(E)P(G) \not{\Rightarrow} P(FG) = P(F)P(G)$.
+
+### 2.8.1. Repeated Trials
+
+A typical case of independent events is the **repeated trials** of an
+experiment, which consists in repeating $n$ times the same sub-experiment under
+**independent conditions**.
+
+_Independent conditions_ means that the outcome of the $i$-th trial doesn't
+depend on the outcome of the previous trials.
+
+#### 2.8.1.1. Exercise: Coin Tossing
+
+> A coin is flipped five times, in independent conditions.
+>
+> Compute:
+> a) The first three flips yield the same outcome
+> b) Either the first three, or the last three, yield the same outcome
+> c) There are al least two heads in the first three flips, and two tails in
+> the last three flips.
+
+Since the coin is fair, we can solve this problem either with _independent
+events_ or with a _uniform probability model_.
+
+Let's solve the problem with independent events.
+
+The first question means that:
+
+- We flip once, and obtain something $(P = 1)$
+- We flip again, and it is the same as the first $(P = \frac{1}{2})$
+- We flip again, and it is the same as the first $(P = \frac{1}{2})$
+
+The three events are independent, thus the probability of the event is $P(a) = \frac{1}{4}$.
+
+By counting, the only acceptable outcomes are $HHHXX$ and $TTTXX$, thus the
+probability is $P(a) = \frac{8}{32} = \frac{1}{4}$.
+
+For the b) question, we have to compute the probability of $F \cup L$, where
+$F$ is the event "first three flips yield the same outcome" and $L$ is the event
+"last three flips yield the same outcome".
+
+$F$ and $L$ are not independent mutually exclusive, since the event $F \cap L$
+is the event "all flips yield the same".
+
+The event $P(F\cap L)$ is the same as $P(P)$ but extended to 5 flips, thus
+$P(F\cap L) = \frac{1}{16}$.
+
+Hence:
+
+$$
+\begin{align*}
+  P(F\cup L) &= P(F) + P(L) - P(F\cap L) \\
+  &= \frac{1}{4} + \frac{1}{4} - \frac{1}{16} = \frac{7}{16}
+\end{align*}
+$$
+
+For the c) question, the UPM model is preferable, since out of the 32 possible outcomes,
+the following are in the event We want to observe $\Set{xHHTT, HxHTT, HHxTT,
+HHTTxT, HHTTx}$
+
+Without including duplicates, we can count the number of outcomes that satisfy
+the event:
+
+- For the first set $x$ can be either $H$ or $T$
+- For the second one, it can be only $T$, otherwise we would again have three
+  heads in the first three flips, that we already counted in the first set.
+- For the 3rd, it can be only $T$ for the same reason as the second set.
+- For the forth and fifth it can be only $H$.
+
+Therefore we have $6$ outcomes in our event, the result is $P = \frac{6}{32} = \frac{3}{16}$.
+
+#### 2.8.1.2. Example: Keys and Doors
+
+> Mario Rossi has a bunch of $n$ keys, one of which opens the door.
+>
+> Its workflow is:
+> i) Choosing a key at random
+> ii) Discarding it if it's the wrong one
+>
+> What is the probability that:
+> a) He opens the door on the $k$-th attempt
+> b) He opens the door _within_ $k$ attempts
+
+The outcome is a sequence of keys, extracted by the permutation of the $n$ keys.
+
+Given that each one of keys has an equal probability of being chosen, the
+probability of the correct key being in the $k$-th position is the same
+exercise we did in [one of the previous sections](#example-ordering-people),
+thus the probability of a) is $P(a) = \frac{1}{n}$.
+
+The second question as well is similar, since the extractions are mutually
+exclusive, thus the probability of b) is $P(b) = \frac{k}{n}$.
+
+We can make a variation on the subject:
+
+> Mario Rossi, **who is drunk**, has a bunch of $n$ keys, one of which opens
+> the door.
+>
+> Its workflow is:
+> i) Choosing a key at random
+> ii) If it's the wrong one, **he puts it back**
+>
+> What is the probability that:
+> a2) He opens the door on the $k$-th attempt
+> b2) He opens the door _within_ $k$ attempts
+
+In this new set, we have repeated trials of independent events, since the keys
+are put back in the bunch.
+
+For the probability a2), we can say that the probability of taking the right key
+on the $k$-th attempt means to gat the wrong one for the previous $k-1$, meaning:
+
+$$
+P(E_k) = (1-p)^{k-1}p
+$$
+
+The probability of choosing one key at random is $p = \frac{1}{n}$, thus the
+probability of a2) is:
+
+$$
+P(a2) = \left(1 - \frac{1}{n}\right)^{k-1} \cdot \frac{1}{n} = \frac{(n-1)^{k-1}}{n^k}
+$$
+
+The probability b2) is the probability of the **union** of the $E_k$ events,
+from $1$ to $k$. Since this events are mutually exclusive, we can sum the probabilities:
+
+$$
+\begin{align*}
+P(b2) &= \sum_{i=1}^k{P(E_i)} \\
+      &= \sum_{i=1}^k{\frac{(n-1)^{i-1}}{n^i}} \\
+      &= \frac{1}{n}\sum_{i=0}^{k-1}{\left(\frac{n-1}{n}\right)^i} \\
+      &= \frac{1}{n} \cdot \frac{1 - \left(\frac{n-1}{n}\right)^k}{1 -
+          \frac{n-1}{n}} \\
+      &= 1 - \left(\frac{n-1}{n}\right)^k
+\end{align*}
+$$
+
+This result is perfectly comparable to the fact that opening the door within
+$k$ attempts is the complement of not opening the door for $k$ attempts:
+
+$$
+P(b2) = 1 - (1-p)^k = \dots = 1 - \left(\frac{n-1}{n}\right)^k
+$$
+
+## 2.9. Parallel Systems
+
+A system is said to be **parallel** if it is composed of $n$ sub-systems, and
+it works if _at least one of the subsystems is working_.
+
+<div class="grid2">
+<div class="">
+
+The same model can be explained in terms of **switches**.
+
+In the image on the right, sub-systems are represented by power switches, and
+the current flows between $A$ and $B$ id at least one of the switches is open
+(i.e. the sub-system is working).
+
+Assuming that each switch has a probability $p_i$ that it's closed, and are independent,
+the probability that the current flows (i.e. at least one works) is the complementary of that
+none of the switches work, thus:
+
+$$
+\begin{align*}
+  P(p) &= 1 - P(p) \\
+    &= 1 - P\left(\prod_{i=1}^n{A_i^C}\right) \\
+    &= 1 - P\left(\prod_{i=1}^n{1 - p_i}\right) \\
+\end{align*}
+$$
+
+</div>
+<div class="">
+<img class="80" src="./images/probability/parallel-switches.png">
+</div>
+</div>
+
+### 2.9.1. Example: Harder Systems
+
+> Call $p_i$ the probability that the $i$-th sub-system works.
+>
+> Compute the probability that the system works in the following configuration:
+
+<img class="" src="./images/probability/example-parallel.png">
+
+For the system on the right, for the current to flow $A \to B$, it means that
+it has to flow at least past the parallel switches, and then through the
+series switches:
+
+$$
+\begin{align*}
+  P(A\to B) &= P(A\to C) \cdot P(C\to B) \\
+    &= \left[1 - (1 - p_1p_2)(1 - p_3p_4)\right] \cdot p_5
+\end{align*}
+$$
+
+For the system on the right instead, we can make a study of _conditional
+probability_, making assumption on the state of the 3rd switch.
+
+$$
+P(A\to B) = P(A\to B \vert A_3)P(A_3) + P(A\to B \vert A_3^C)P(A_3^C)
+$$
+
+The singular probabilities are:
+
+- $P(A\to B \vert A_3) = \left[1 - (1-p_1)(1-p_2)\right]\left[1 - (1-p_4)(1-p_5)\right]$
+- $P(A\to B \vert A_3^C) = 1 - \left(1 - p_1p_4\right)\left(1-p_2p_5\right)$
+
+The overall probability is then:
+
+$$
+\begin{align*}
+  P(A\to B) &= P(A\to B \vert A_3)P(A_3) + P(A\to B \vert A_3^C)P(A_3^C) \\
+    &= \left[1 - (1-p_1)(1-p_2)\right]\left[1 - (1-p_4)(1-p_5)\right]p_3 +
+        \left[1 - \left(1 - p_1p_4\right)\left(1-p_2p_5\right)\right](1-p_3)
+\end{align*}
+$$

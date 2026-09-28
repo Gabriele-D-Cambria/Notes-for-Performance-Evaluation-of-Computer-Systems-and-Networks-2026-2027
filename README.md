@@ -70,7 +70,8 @@ Requirements for the course are:
 
 ### Theory (Stea)
 
-1. [Probability](./Probability)
+1. [Introduction to Probability](./Introduction%20to%20Probability)
+2. [Random Variables](./Random%20Variables)
 
 ### Simulations (Nardini)
 
