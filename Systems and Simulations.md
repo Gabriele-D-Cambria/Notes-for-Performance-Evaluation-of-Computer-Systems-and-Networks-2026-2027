@@ -10,6 +10,12 @@ title: Systems and Simulations
 - [3. Simulations](#3-simulations)
   - [3.1. Types of Simulations Model](#31-types-of-simulations-model)
   - [3.2. How to build a Good Simulator](#32-how-to-build-a-good-simulator)
+  - [3.3. Event Queue](#33-event-queue)
+  - [3.4. Components of a Simulator](#34-components-of-a-simulator)
+    - [3.4.1. Example: Router Simulation](#341-example-router-simulation)
+  - [3.5. Implementing the Event Queue](#35-implementing-the-event-queue)
+    - [3.5.1. Min-Heap Tree](#351-min-heap-tree)
+    - [3.5.2. Calendar Queue](#352-calendar-queue)
 
 # 2. Systems
 
@@ -167,7 +173,7 @@ in \_event-based simulations.
 For these reasons we will assume that our `DES` will use the **Next-Time
 Advance Mechanism**.
 
-## Event Queue
+## 3.3. Event Queue
 
 An event is represented by a **Data Structure** that contains the following information:
 
@@ -189,7 +195,7 @@ Event handling is a critical issue for system performance. Depending on ho effic
 we perform the (de)queueing of events the RT that it takes for a simulation to
 run can easily change by orders of magnitude.
 
-## Components of a Simulator
+## 3.4. Components of a Simulator
 
 Since the purpose of simulating a system is to evaluate its performance, we
 need to **collect statistics** about the system.
@@ -253,11 +259,13 @@ computation might be more efficient.
 </div>
 </div>
 
+---
+
 In this course we will explore `OMNeT++`, a general purpose simulator that
 provides us with a _general purpose simulation engine_ and a _graphical user
 interface_, letting us only the duty of building only the **simulation model**.
 
-### Example: Router Simulation
+### 3.4.1. Example: Router Simulation
 
 > Suppose we want to simulate a router, which receives and sends packets.
 >
@@ -342,7 +350,7 @@ have are not enough. Hence we would have to add a new statistical counter,
 like a _vector_, which would need to keep all the delays values (eventually
 removing the redundant `delay_sum`), and **re-run the whole simulation**.
 
-## Implementing the Event Queue
+## 3.5. Implementing the Event Queue
 
 A discrete event simulator spends a lot if time handling the _event queue_, since
 the steps involved in a simulation are:
@@ -362,7 +370,7 @@ Commonly employed data structures for the event queue are:
 - **Min-Heap Tree**
 - **Calendar Queue**
 
-### Min-Heap Tree
+### 3.5.1. Min-Heap Tree
 
 It's a _binary tree_ (with $N$ nodes) where:
 
@@ -405,7 +413,88 @@ _re-heapification_, with the consideration is that locating the event takes $O(N
 This means that in models with frequent event deletions might not be suitable
 to implement the _event queue_ with a Min-Heap.
 
-### Calendar Queue
+### 3.5.2. Calendar Queue
 
-Is a data structure that keeps track of $M$ **buckets**, each of which is a
-_sorted list_ of events.
+Is a data structure that keeps track of $M$ **buckets** each of which is
+a _sorted list_ of events.
+
+The buckets represents the month of a calendar, the events the appointments in
+each month.
+
+All buckets have the same _width_ $\delta$, which represents the time interval of
+events that can be stored in that bucket. An event with firing time $t$ will be
+placed in buckets $i = \left\lfloor\frac{t}{\delta}\right\rfloor_{\text{mod } M}$
+
+Since each bucket is a sorted list, events within the same bucket are sorted
+in time.
+
+If the events are distributed more or less uniformly, the probability of
+having an
+"empty" bucket is quite small.
+
+Moreover, if $M$ is large enough, the number of collisions of events of different
+years on the same day is low.
+
+In a worst-case-scenario, it may happen that:
+
+- All events are in the same bucket, which will degenerate the calendar queue
+  into a single sorted list. The complexity will be either $O(N)$ for linear
+  queues, or $O(\log_2{N})$ for min-heap.
+- We need to cycle through $O(M)$ empty buckets.
+
+The calendar queue has a worst-case complexity of $O(N+M)$ (or $O(\log_2{N} + M)$),
+although the average number of operation required to insert/extract events is
+quite small.
+
+We take in consideration worst-case costs when we need to guarantee a _maximum
+execution time_, meanwhile we consider average-case costs when we want to minimize
+the overall running time of a system.
+
+If events are:
+
+- Evenly distributed in the buckets
+- There are too many consecutive buckets
+
+Then it is quite easy to locate the next event to be scheduled, and it is not
+computationally expensive to keep each bucket's queue sorted.
+
+Since the number of buckets is not infinite, it can happen that two events distant
+"a year apart", fall into the same bucket.
+
+Thus, when extracting the next event we have to take into consideration that it
+might be in a bucket that is not the current one.
+
+The rule we follow is the following:
+
+```pseudocode
+j = <current_year>  # It starts at 0 and increments every time we complete a cycle
+if (<firing_time_of_top_event >= j * M * delta)
+  // Go to the next bucket
+else
+  // Pick from the current bucket
+```
+
+On average we need to sort only a small subset of events for each bucket. Although
+incrementing $M$ decreases the number of collisions by bucket, it increases
+the number of queues we need to sort.
+
+Thus, we need to wisely choose $\delta$ and $M$.
+
+Since the number of elements could change over time, it is possible to **dynamically
+resize** the calendar:
+
+- If the number of events is _twice_ the number of buckets &emsp; $\to$ &emsp;
+  $M = M * 2$
+- If the number of events is _half_ the number of buckets &emsp; $\to$ &emsp;
+  $M = \frac{M}{2}$
+
+When resizing the calendar, we need to **re-hash** all the events. There are two
+strategies to do this:
+
+- **Freeze**: When changing $M$, we stop the simulation, build the new _calendar-queue_,
+  move all the events from the old queue to the new one and then resume the simulation
+- **Gradual**: When changing $M$, we build the new queue and start populating it
+  with new events. While we do this, we keep extracting events from the old queue,
+  until it is empty, then discard it (except for the "end of simulation"
+  events, which must be moved to the new queue). Each time we want to extract
+  a new event we must check whether it is in the old or new queue.

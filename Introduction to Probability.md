@@ -181,7 +181,7 @@ The problems asks the quantity $P((E \cup F)^C)$:
 $$
 \begin{align*}
   P((E \cup F)^C) &= 1 - P(E \cup F) \\
-  &= 1 - [P(E) + P(F) - P(EF)] \\
+  &= 1 - \left[P(E) + P(F) - P(EF)\right] \\
   &= 1 - 0.28 - 0.07 + 0.05 = 0.7
 \end{align*}
 $$
@@ -235,7 +235,7 @@ We can model this experiment by numbering the balls:
 We can model the sample space as:
 
 $$
-S = \Set{(b_i, b_j) \vert 1 \le i,j \le 11, i \ne j}
+S = \Set{(b_i, b_j) \;\vert\; 1 \le i,j \le 11, i \ne j}
 $$
 
 To compute the cardinality of this set, we observe that the random experiment
@@ -340,7 +340,7 @@ For the a) question our composite experiment is composed of two sub-experiments:
 Thus, the probability of the event is:
 
 $$
-  P(a) \frac{5 \cdot 14!}{15!} = \frac{5}{15} = \frac{\text{#boys}}{\text{#people}}
+  P(a) \frac{5 \cdot 14!}{15!} = \frac{5}{15} = \frac{\text{\#boys}}{\text{\#people}}
 $$
 
 The answer to question c) is similar, but we need to consider that Adam is a
@@ -378,12 +378,11 @@ $$
     s_{k,n} &= \frac{n!}{(n-k)!} \\
     s_{k-1,n-1} &= \frac{(n-1)!}{(n-k)!}
   \end{align*} \\
-@VVV
+@VVV \\
   \begin{align*}
     P(a) &= \frac{s_{k-1,n-1}}{s_{k,n}} \\
     &= \frac{\frac{(n-1)!}{(n-k)!}}{\frac{n!}{(n-k)!}} \\
-    &= \frac{(n-1)!}{n!} \\
-    &= \frac{1}{n}
+    &= \frac{(n-1)!}{n!} =  \frac{1}{n}
   \end{align*}
 \end{CD}
 $$
@@ -426,8 +425,8 @@ $$
 All possible outcomes are counted by the following product of binomial coefficients:
 
 $$
-\binomial{12}{2} \cdot \binomial{10}{2} \cdot \binomial{8}{2} \cdot
-\binomial{6}{2} \cdot \binomial{4}{2} \cdot \binomial{2}{2} = \frac{12!}{2^6}
+\binom{12}{2} \cdot \binom{10}{2} \cdot \binom{8}{2} \cdot
+\binom{6}{2} \cdot \binom{4}{2} \cdot \binom{2}{2} = \frac{12!}{2^6}
 $$
 
 This results is still taking in consideration the ordering of the rooms, which
@@ -452,9 +451,9 @@ $$
 **Conditional probability** is the probability of an event $E$ given that another
 event $F$ has occurred: $P(E \vert F)$
 
-For example, if we have two dices and want the event $E = \text{sum} \ge 10$.
+For example, if we have two dices and want the event $E = \text{sum} \ge 10$.  
 The sample space is $S = \Set{(i, j) \vert 1 \le i,j \le 6}$, and the event
-$E$ is given by the pairs $\Set{(4,6), (5,5), (5,6), (6,4), (6,5), (6,6)}$., so:
+$E$ is given by the pairs $\Set{(4,6), (5,5), (5,6), (6,4), (6,5), (6,6)}$, meaning:
 
 $$
 P(E) = \frac{6}{36} = \frac{1}{6}
@@ -486,7 +485,7 @@ The conditional probability is a _probability measure_ on the event $E$,
 and has the following properties:
 
 - $EF \subseteq F \Rightarrow P(E\vert F) \le P(F)$
-- $P(E\bert F) = 1 \Leftrightarrow F \subseteq E$
+- $P(E\vert F) = 1 \Leftrightarrow F \subseteq E$
 - $P(E\vert F) \ne P(F\vert E)$
 
 In out study case we calculate:
@@ -569,7 +568,9 @@ The theorem is defined as:
 > occurrence of an event $E$ may be due to some of these hypotheses:
 >
 > $$
+> \boxed{
 >   P(F_j \vert E) = \frac{P(E\vert F_j)P(F_j)}{\sum_i^n{P(E\vert F_i)P(F_i)}}
+> }
 > $$
 
 ### 2.7.1. Example: Lab Tests
@@ -854,6 +855,6 @@ $$
 \begin{align*}
   P(A\to B) &= P(A\to B \vert A_3)P(A_3) + P(A\to B \vert A_3^C)P(A_3^C) \\
     &= \left[1 - (1-p_1)(1-p_2)\right]\left[1 - (1-p_4)(1-p_5)\right]p_3 +
-        \left[1 - \left(1 - p_1p_4\right)\left(1-p_2p_5\right)\right](1-p_3)
+        \left[1 - \left(1 - p_1p_4\right)\left(1-p_2p_5\right)\right]\cdot(1-p_3)
 \end{align*}
 $$

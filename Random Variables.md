@@ -21,7 +21,7 @@ There are several ways to define _random variables_.
 We will define them as **real-valued functions**:
 
 > Given a **random experiment** whose sample space is $S$, we say that $X$ is a
-> **Random Variable** on $S$ if it is a **Real-Valued function** $X:S\to\Reals$.
+> **Random Variable** on $S$ if it is a **Real-Valued function** $X:S\to\R$.
 
 Random variables are denoted with **uppercase letters**, and have _nothing
 random in itself_.
@@ -36,9 +36,9 @@ $$
 
 We can define the following random variables:
 
-- $X$: **sum** of the values on each die: &emsp;$X:S\to \Reals, X((d_1, d_2))
+- $X$: **sum** of the values on each die: &emsp;$X:S\to \R, X((d_1, d_2))
 = d_1 + d_2$
-- $Y$: **maximum** value on either die: &emsp;$X:S\to \Real, X((d_1, d_2)) = \max{(d_1,d_2)}$
+- $Y$: **maximum** value on either die: &emsp;$X:S\to \R, X((d_1, d_2)) = \max{(d_1,d_2)}$
 
 $X$ takes on values $\Set{2, 3, ..., 11, 12}$, whereas $Y$ takes on values $\Set{1,2,...,6}$.
 
@@ -129,7 +129,7 @@ The first step, as said by the professor, is to:
 
 In this case the plot is the following:
 
-<img class="" src="./images/random_variable/example-1-cdf.png">
+<img class="" src="./images/random-var/example-1-cdf.png">
 
 The request of the exercise is the complementary of the definition of the CDF, hence:
 
@@ -218,7 +218,7 @@ $$
 This definition uphold the **normalization condition**:
 
 $$
-  P\Set{X\in \Reals} = \int_{\Reals}{f(x)\;dx} = 1
+  P\Set{X\in \R} = \int_{\R}{f(x)\;dx} = 1
 $$
 
 Moreover, if $B$ is an interval $[a, b]$, we have that:
@@ -252,7 +252,7 @@ $$
 F(a) = P\Set{X \le a} = \int_{-\infty}^{a}{f(x)\;dx}
 $$
 
-If we take the other way around, we can differentiate the CDF (where possible)
+Taking the other way around, we can differentiate the CDF (where possible)
 to get the PDF:
 
 $$
