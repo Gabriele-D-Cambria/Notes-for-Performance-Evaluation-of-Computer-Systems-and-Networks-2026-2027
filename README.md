@@ -4,7 +4,7 @@ These are _Performance Evaluation of Computer Systems_
 _2026-2027_ course from University of Pisa.
 For an optimal visualization, styling, math formulas rendering
 and navigation links, consult the online version available at
-[GitHub Pages](https://gabriele-d-cambria.github.io/Notes-for-Performance-Evaluation-of-Computer-Systems-2026-2027).
+[GitHub Pages](https://gabriele-d-cambria.github.io/Notes-for-Performance-Evaluation-of-Computer-Systems-and-Networks-2026-2027/).
 
 ## 📚 Course Informations
 
