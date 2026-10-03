@@ -230,7 +230,7 @@ on the right.
 
 </div>
 <div class="">
-<img class="80" src="./images/simulation/sim-components.png">
+<img class="50" src="./images/simulation/sim-components.png">
 </div>
 </div>
 

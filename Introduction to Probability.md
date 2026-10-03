@@ -73,7 +73,7 @@ outcome of the Sample Space**: &emsp;$E \subseteq S$
 
 Some special events are:
 
-- **Null Event**: $\empty$
+- **Null Event**: $\emptyset$
 
 - **Certain Event**: $S$
 
@@ -86,7 +86,7 @@ Since events are sets, we can use _Set Algebra_ to manipulate them:
   are the events that appear in both $E$ and $F$
 
 - **Complement** $(E^C)$: The complement of an Event $E$ is the event $F$ that
-  produces a _Null Set_ when intersected $E^C \cap E = \empty$
+  produces a _Null Set_ when intersected $E^C \cap E = \emptyset$
 
 These three algebraic relations are related by _De Morgan's Law_:
 
@@ -145,7 +145,7 @@ The axioms on which probability works on are:
 
 2. $P(S) = 1$
 
-3. $E_i \vert E_iE_j = \empty \wedge i \ne j \Rightarrow P(\bigcup_i E_j) = \sum_i{P(E_i)}$
+3. $E_i \vert E_iE_j = \emptyset \wedge i \ne j \Rightarrow P(\bigcup_i E_j) = \sum_i{P(E_i)}$
 
 Starting from these three axioms, we can derive a couple of _useful properties_:
 
@@ -374,16 +374,16 @@ a) and b) are the same, nonetheless, we can calculate the probability:
 
 $$
 \begin{CD}
-  \begin{align*}
+  \begin{aligned}
     s_{k,n} &= \frac{n!}{(n-k)!} \\
     s_{k-1,n-1} &= \frac{(n-1)!}{(n-k)!}
-  \end{align*} \\
+  \end{aligned} \\
 @VVV \\
-  \begin{align*}
+  \begin{aligned}
     P(a) &= \frac{s_{k-1,n-1}}{s_{k,n}} \\
     &= \frac{\frac{(n-1)!}{(n-k)!}}{\frac{n!}{(n-k)!}} \\
     &= \frac{(n-1)!}{n!} =  \frac{1}{n}
-  \end{align*}
+  \end{aligned}
 \end{CD}
 $$
 
@@ -520,7 +520,7 @@ $$
 This is called the **Law of Total Probability**.
 
 More in general, the definition given $n$ given $F$ events $F_1, F_2, ...,
-F_n$ that are **mutually exclusive** (i. e. $F_iF_j = \empty, i \ne j$) and
+F_n$ that are **mutually exclusive** (i. e. $F_iF_j = \emptyset, i \ne j$) and
 **exhaustive** (i.e. $\bigcup_i F_i = S$), we can describe the probability of
 an event $E$ as:
 
@@ -564,7 +564,7 @@ $$
 The theorem is defined as:
 
 > Given $F_1, ..., F_n$ (hypotheses) such that $\bigcup_i^n{F_i} = S$ and
-> $F_i\cap F_J = \empty, i \ne j$, and the prior probabilities $P(F_i)$, the
+> $F_i\cap F_J = \emptyset, i \ne j$, and the prior probabilities $P(F_i)$, the
 > occurrence of an event $E$ may be due to some of these hypotheses:
 >
 > $$

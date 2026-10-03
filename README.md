@@ -75,7 +75,7 @@ Requirements for the course are:
 
 ### Simulations (Nardini)
 
-1. [System and Simulations](./System%20and%20Simulations)
+1. [Systems and Simulations](./Systems%20and%20Simulations)
 
 ## 📜 Disclaimer
 
