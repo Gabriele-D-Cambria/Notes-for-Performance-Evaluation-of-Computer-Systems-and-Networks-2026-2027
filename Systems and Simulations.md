@@ -399,7 +399,7 @@ After the extraction, we need to **re-heapify** the tree. To do so, we can
 take the _last node_ and put it as the new root. Then, if the root is grater
 than at least one of its children, we swap it with the minimum between the two
 children. We can then recursively delve in the tree and do the same with each
-sub-tree. This whole operation is $O(\log_2(N)$.
+sub-tree. This whole operation is $O(\log_2(N))$.
 
 Overall, is faster than using a _linked list_ or a _sorted array_.
 
@@ -468,7 +468,7 @@ The rule we follow is the following:
 
 ```pseudocode
 j = <current_year>  # It starts at 0 and increments every time we complete a cycle
-if (<firing_time_of_top_event >= j * M * delta)
+if (<firing_time_of_top_event> >= j * M * delta)
   // Go to the next bucket
 else
   // Pick from the current bucket
