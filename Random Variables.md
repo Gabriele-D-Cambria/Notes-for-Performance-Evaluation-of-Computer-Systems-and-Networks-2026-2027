@@ -404,7 +404,6 @@ The first step is to draw the function:
 <img class="" src="./images/random-var/example-radio-tubes.png"
       alt="Graph of the PDF">
 
-
 Since it pays to be skeptical, we check if the function is normalized:
 
 $$
@@ -609,7 +608,8 @@ $$
 
 ### 2.6.4. Joint Distributions of $n$ Random Variables
 
-The definition given above, can be extended to the case of $n$ RV $X_1, X_2, ..., X_n$:
+The definition given above, can be extended to the case of $n$ RV $X_1, X_2,
+..., X_n$:
 
 $$
   F(x_1, x_2, ..., x_n) = P\Set{X_1\le x_1, X_2\le x_2, ..., X_n\le x_n}
