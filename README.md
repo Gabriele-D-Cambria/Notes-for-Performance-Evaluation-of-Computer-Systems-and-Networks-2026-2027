@@ -73,6 +73,7 @@ Requirements for the course are:
 1. [Introduction to Probability](./Introduction%20to%20Probability)
 2. [Random Variables](./Random%20Variables)
 3. [RVs Mode Mean and Variance](./RVs%20Mode%20Mean%20and%20Variance)
+4. [Special Random Variables](./Special%20Random%20Variables)
 
 ### Simulations (Nardini)
 

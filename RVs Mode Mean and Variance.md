@@ -20,6 +20,8 @@ title: RVs Mode Mean and Variance
   - [2.3. Variance](#23-variance)
     - [2.3.1. Indicator RV for Variance](#231-indicator-rv-for-variance)
     - [2.3.2. Variance of Linear Transformations](#232-variance-of-linear-transformations)
+  - [2.4. Covariance](#24-covariance)
+    - [2.4.1. Covariance and Correlation](#241-covariance-and-correlation)
 
 # 2. RVs Mode Mean and Variance
 
@@ -417,3 +419,163 @@ This tells us two things:
 - **Rescaling does matter**: rescaling by a constant factor $a$ means:
   - **Compressing** the distribution if $a < 1$
   - **Spreading** the distribution if $a > 1$
+
+In both cases, the multiplicative factor for the variance is $a^2$, meaning
+that the _spread_ of the distribution is **squared** when rescaling.
+
+## 2.4. Covariance
+
+When we were analyzing the mean value, we also noticed that the mean of the
+sum of RVs is the sum of the mean values of the single RVs. For the variance
+this is not true.
+
+A simple counterexample is the following:
+
+$$
+\operatorname*{Var}(X+X) = \operatorname*{Var}(2X)
+= 4 \cdot \operatorname*{Var}(X) \ne 2 \cdot \operatorname*{Var}(X)
+$$
+
+Therefore, we need to figure out a way the formula for the variance of the sum
+of RVs:
+
+$$
+\begin{align*}
+  \operatorname*{Var}(X+Y) &= E\left[(X + Y - E[X + Y])^2\right] \\
+  &= E\left[(X + Y - \mu_X - \mu_Y)^2\right] \\
+  &= E\left[(X - \mu_X + Y - \mu_Y)^2\right] \\
+  &= E\left[(X - \mu_X)^2 + (Y - \mu_Y)^2 + 2(X - \mu_X)(Y - \mu_Y)\right] \\
+  &= E\left[(X - \mu_X)^2\right] + E\left[(Y - \mu_Y)^2\right] +
+    2E\left[(X - \mu_X)(Y - \mu_Y)\right] \\
+  &= \operatorname*{Var}(X) + \operatorname*{Var}(Y) +
+    2E\left[(X - \mu_X)(Y - \mu_Y)\right]
+\end{align*}
+$$
+
+The last term is called **covariance** of $X$ and $Y$, and it is denoted as:
+
+$$
+  \operatorname*{Cov}(X, Y) = E\left[(X - \mu_X)(Y - \mu_Y)\right]
+$$
+
+Developing the covariance, we can also write it as:
+
+$$
+\begin{align*}
+  \operatorname*{Cov}(X, Y) &= E\left[(X - \mu_X)(Y - \mu_Y)\right] \\
+  &= E[XY - X\mu_Y - Y\mu_X + \mu_X\mu_Y] \\
+  &= E[XY] - \mu_YE[X] - \mu_XE[Y] + \mu_X\mu_Y \\
+  &= E[XY] - \mu_Y\mu_X - \mu_X\mu_Y + \mu_X\mu_Y \\
+  &= E[XY] - \mu_X\mu_Y
+\end{align*}
+$$
+
+Therefore the covariance is the **expectation of the product** _minus_ the
+**product of the expectations**.
+
+Some properties of the covariance are:
+
+- **Commutative**: $\operatorname*{Cov}(X, Y) = \operatorname*{Cov}(Y, X)$
+- $\operatorname*{Cov}(X, X) = \operatorname*{Var}(X)$
+- $\Cov(X, Y) = 0$ if $X$ and $Y$ are independent.
+
+From the last property, we can see that **if $X$ and $Y$ are independent _the
+variance of their sum is the sum of the variances_**.
+
+For the case of the _sum of $n$ variables_, we have:
+
+$$
+\begin{align*}
+  \operatorname*{Var}\left(\sum_{i}{X_i}\right) &=
+    \sum_{i}{\operatorname*{Var}(X_i)} +
+\sum_{i}^n{\sum_{j\ne i}^n{\operatorname*{Cov}(X_i, X_j)}} \\
+  &= \sum_{i}^n{\sum_{j}{\operatorname*{Cov}(X_i, X_j)}}
+\end{align*}
+$$
+
+### 2.4.1. Covariance and Correlation
+
+We saw that the covariance of two variables can be either **positive,**
+**negative** or **null**. Its sign has an important physical explanation.
+
+To show this, let's define two events $A$ and $B$, and the related indicator
+RVs $I_A$ and $I_B$:
+
+$$
+\begin{matrix}
+I_A = \begin{cases}
+  1 & \text{if $A$ occurs} \\
+  0 & \text{otherwise}
+\end{cases} &
+\qquad &
+I_B = \begin{cases}
+  1 & \text{if $B$ occurs} \\
+  0 & \text{otherwise}
+\end{cases}
+\end{matrix}
+$$
+
+The product of the two indicator RVs $I_A \cdot I_B$ will be null _if and only if_
+the event $AB$ occurs.
+
+Computing the covariance:
+
+$$
+\begin{align*}
+  \operatorname*{Cov}(I_A, I_B) &= E[I_AI_B] - E[I_A]E[I_B] \\
+  &= P(AB) - P(A)P(B)
+\end{align*}
+$$
+
+From this we can discriminate three cases.
+
+The first one is when $\operatorname*{Cov}(I_A, I_B) > 0$, meaning $P(AB) > P(A)P(B)$.
+Hence:
+
+$$
+  P(A\vert B) = \frac{P(AB)}{P(B)} > P(A)
+$$
+
+Conversely, if $\operatorname*{Cov}(I_A, I_B) < 0$, meaning $P(AB) <
+P(A)P(B)$, we get:
+
+$$
+P(A\vert B) = \frac{P(AB)}{P(B)} < P(A)
+$$
+
+The same occurs for $P(B\vert A)$, since both covariance and intersection are
+symmetric, meaning that:
+
+- **Positive Covariance** indicates that $A$ is _more likely_ to occur if $B$ occurs.
+- **Negative Covariance** indicates that $A$ is _less likely_ to occur if $B$ occurs.
+
+This respects the result we found before that if two events are independent,
+their covariance is null.
+
+In general, if we take 2 RVs $X$ and $Y$, a **positive covariance** means that _large
+values of $X$ come together with large values of $Y$_, while a **negative
+covariance** means that _large values of $X$ come together with small values
+of $Y$_.
+
+We can _normalize_ this measurement defining the **Correlation**:
+
+$$
+\operatorname*{Corr}(X, Y) = \frac{\operatorname*{Cov}(X, Y)}
+  {\sqrt{\operatorname*{Var}(X)\operatorname*{Var}(Y)}} \in [-1, 1]
+$$
+
+When the correlation is positive we have a _high calls for high_, when it's
+negative we have a _high calls for low_.
+
+The absolute magnitude of the correlation reveals _how much one RV can be predicted
+from the other_.
+
+For example, if the correlation is equal to $1$, it means that one is a
+linear scaling of the other $(X = aY + b)$.
+
+In general, the correlation is a **measure of linear dependence** between two RVs,
+and its invariant under linear scaling:
+
+$$
+\operatorname*{Corr}(aX + b, cY + d) = \operatorname*{Corr}(X, Y) \quad a,c > 0
+$$
