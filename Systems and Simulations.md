@@ -4,6 +4,8 @@ title: Systems and Simulations
 
 # 1. Index
 
+<!--toc:start-->
+
 - [1. Index](#1-index)
 - [2. Systems](#2-systems)
   - [2.1. Performance Evaluations](#21-performance-evaluations)
@@ -16,6 +18,11 @@ title: Systems and Simulations
   - [3.5. Implementing the Event Queue](#35-implementing-the-event-queue)
     - [3.5.1. Min-Heap Tree](#351-min-heap-tree)
     - [3.5.2. Calendar Queue](#352-calendar-queue)
+  - [3.6. Give Inputs](#36-give-inputs)
+    - [3.6.1. Trace-Driven Simulations](#361-trace-driven-simulations)
+    - [3.6.2. Self-Driven Simulations](#362-self-driven-simulations)
+    - [3.6.3. Empirical Distribution Simulations](#363-empirical-distribution-simulations)
+      <!--toc:end-->
 
 # 2. Systems
 
@@ -498,3 +505,71 @@ strategies to do this:
   until it is empty, then discard it (except for the "end of simulation"
   events, which must be moved to the new queue). Each time we want to extract
   a new event we must check whether it is in the old or new queue.
+
+## 3.6. Give Inputs
+
+We have several way to give inputs to a simulation system:
+
+- **Trace-Driven**: the simulations takes inputs by measuring a real system.
+- **Self-Driven**: the simulations uses _artificially generated_ inputs from a distribution.
+
+It is also possible to use an hybrid form of the two approaches, for example
+we can obtain MPEG video packets and transmit them to nodes that are
+moving according to a theoretical distribution.
+
+There are also cases when we can't fit our data to a known distribution, but we
+have to **extract a distribution from the PMF of our data**, in an approach
+called **Empirical Distribution**.
+
+### 3.6.1. Trace-Driven Simulations
+
+An example of trace-driven simulation is using a `MPEG` compressed video.
+
+The file is composed of a list of tuples with format `<time, video_frame_size>`.
+
+Supposing we want to generate an event at a given time that triggers the
+transmission of a video frame, we can simply read the file and schedule the events.
+
+Simulating this kind of files is extremely difficult though, so we might think
+to use an actual compressed video.
+
+This has some advantages, like _saleability_ (we can use the same video for
+different simulations) and nice validation (we can compare the output of the
+simulation with the actual video).
+
+As disadvantages, we have that the simulation is _not flexible_ (we can't
+change the video) and _not scalable_ (we can't use the same video for
+different scenarios). Furthermore, we might need to filter the data introducing
+an overhead to obtain a _trace_ that might not be even tuned (adjusted to increase
+ratios).
+
+### 3.6.2. Self-Driven Simulations
+
+Its the opposite of the previous approach. In this case we generate the input
+artificially, using a probability distribution that closely mirrors the phenomenon
+of interest.
+
+To select the right distribution we can gather data from the system and find it
+mathematically, read any existing literature, or use _common-sense_ and _try-and-error_.
+
+This approach is more flexible and scalable, but it might be difficult to find
+the right distribution, and it might be difficult to validate the simulation.
+
+### 3.6.3. Empirical Distribution Simulations
+
+It's the last resort we should use when we can't find a distribution that fits
+our data.
+
+We derive an empirical PMF (EPMF) from available samples, being beware of _censored
+data_ (data we miss because of the way we collected it).
+In this phase it is customary to add an **exponential tail** to the right to take
+into account the probability to obtain _larger values_.
+
+In this case, the approach is the following:
+
+1. We find an EPMF
+2. We compute the probabilities
+3. We generate the same input with the same probabilities
+
+As we said, this is a last-resort approach, since it is difficult to validate
+and it is not flexible nor scalable.

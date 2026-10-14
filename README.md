@@ -64,8 +64,6 @@ Requirements for the course are:
 
 - **Coding**: C++
 
-## Lab
-
 ## 📖 Suggested Study Order
 
 ### Theory (Stea)
@@ -78,6 +76,7 @@ Requirements for the course are:
 ### Simulations (Nardini)
 
 1. [Systems and Simulations](./Systems%20and%20Simulations)
+2. [Random Number Generators](./Random%20Number%20Generators)
 
 ## 📜 Disclaimer
 
