@@ -69,14 +69,15 @@ Requirements for the course are:
 ### Theory (Stea)
 
 1. [Introduction to Probability](./Introduction%20to%20Probability)
-2. [Random Variables](./Random%20Variables)
-3. [RVs Mode Mean and Variance](./RVs%20Mode%20Mean%20and%20Variance)
-4. [Special Random Variables](./Special%20Random%20Variables)
+1. [Random Variables](./Random%20Variables)
+1. [RVs Mode Mean and Variance](./RVs%20Mode%20Mean%20and%20Variance)
+1. [Special Discrete Random Variables](./Special%20Discrete%20Random%20Variables)
+1. [Special Continuous Random Variables](./Special%20Continuous%20Random%20Variables)
 
 ### Simulations (Nardini)
 
 1. [Systems and Simulations](./Systems%20and%20Simulations)
-2. [Random Number Generators](./Random%20Number%20Generators)
+1. [Random Number Generators](./Random%20Number%20Generators)
 
 ## 📜 Disclaimer
 

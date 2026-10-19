@@ -1,5 +1,5 @@
 ---
-title: Special Random Variables
+title: Special Discrete Random Variables
 ---
 
 # 1. Index
@@ -7,28 +7,22 @@ title: Special Random Variables
 <!--toc:start-->
 
 - [1. Index](#1-index)
-- [2. Special Random Variables](#2-special-random-variables)
-  - [2.1. Discrete Random Variables](#21-discrete-random-variables)
-    - [2.1.1. Bernoulli Distribution](#211-bernoulli-distribution)
-    - [2.1.2. Binomial Distribution](#212-binomial-distribution)
-    - [2.1.3. Poisson Distribution](#213-poisson-distribution)
-      - [2.1.3.1. Exercise: Accidents in a Motorway](#2131-exercise-accidents-in-a-motorway)
-    - [2.1.4. Geometric Distribution](#214-geometric-distribution)
-    - [2.1.5. Probability Generating Functions](#215-probability-generating-functions)
-      - [2.1.5.1. PMFs of some discrete RVs](#2151-pmfs-of-some-discrete-rvs)
-  - [2.2. Continuous Random Variables](#22-continuous-random-variables)
-    - [2.2.1. Uniform Distribution](#221-uniform-distribution)
-    - [2.2.2. Exponential Distribution](#222-exponential-distribution)
-      - [2.2.2.1. Example: lifetime of series components](#2221-example-lifetime-of-series-components)
+- [2. Special Discrete Random Variables](#2-special-discrete-random-variables)
+  - [2.1. Bernoulli Distribution](#21-bernoulli-distribution)
+  - [2.2. Binomial Distribution](#22-binomial-distribution)
+  - [2.3. Poisson Distribution](#23-poisson-distribution)
+    - [2.3.1. Exercise: Accidents in a Motorway](#231-exercise-accidents-in-a-motorway)
+  - [2.4. Geometric Distribution](#24-geometric-distribution)
+  - [2.5. Probability Generating Functions](#25-probability-generating-functions)
+    - [2.5.1. PMFs of some discrete RVs](#251-pmfs-of-some-discrete-rvs)
+    <!--toc:end-->
 
-# 2. Special Random Variables
+# 2. Special Discrete Random Variables
 
 Some RVs are often encountered in practice. This happens because they are **good
 models of some aspect of reality**. For this reason, we gave them special names.
 
-## 2.1. Discrete Random Variables
-
-### 2.1.1. Bernoulli Distribution
+## 2.1. Bernoulli Distribution
 
 A Bernoullian RV is a **discrete** RV which is equal to $1$ with probability $p$
 (_success_) and equal to $0$ with probability $(1-p)$ (_failure_).
@@ -43,7 +37,7 @@ As we have already seen in previous chapters, its parameter are:
 
 Which shows that the **maximum uncertainty** occurs when $p = \frac{1}{2}$.
 
-### 2.1.2. Binomial Distribution
+## 2.2. Binomial Distribution
 
 Its obtained from the _Bernoulli distribution_, and represents the **number of
 successes in $n$ repeated trials in independent conditions**, each with
@@ -107,7 +101,7 @@ A property of binomial variables is the following:
 This property becomes obvious if we remember that the binomial counts
 the number of successes in the _sum of the trials_.
 
-### 2.1.3. Poisson Distribution
+## 2.3. Poisson Distribution
 
 A **discrete RV** is said to be **Poissonian** with parameter $\lambda$ if its
 PMF is given by:
@@ -259,7 +253,7 @@ $$
 \end{align*}
 $$
 
-#### 2.1.3.1. Exercise: Accidents in a Motorway
+### 2.3.1. Exercise: Accidents in a Motorway
 
 > The average number of weekly accidents on a motorway segment is equal to 3.
 > What is the probability that there will be at _least one_ accident next week?
@@ -283,7 +277,7 @@ $$
 \end{align*}
 $$
 
-### 2.1.4. Geometric Distribution
+## 2.4. Geometric Distribution
 
 The geometric distribution is a **discrete** RV which counts the number of
 **failures before the first success** in a repeated trial experiment.
@@ -389,7 +383,7 @@ $$
 This could only be true id $\Set{X \le n}$ and $\Set{X \ge n}$ were independent,
 which they are not.
 
-### 2.1.5. Probability Generating Functions
+## 2.5. Probability Generating Functions
 
 For **discrete and non-negative** RVs, we can exploit a _z-transform_, or **Probability
 Generating Function** (PGF). For a RV $X$ it is defined as:
@@ -459,7 +453,7 @@ $$
 
 This is useful in practice when we need to compute the first few values of a PMF.
 
-#### 2.1.5.1. PMFs of some discrete RVs
+### 2.5.1. PMFs of some discrete RVs
 
 We can find as an exercise the PGFs of some discrete RVs.
 
@@ -565,224 +559,5 @@ $$
     &= \frac{(1-p)^2 + (1-p)p}{p^2} \\
     &= \frac{(1-p)(1-p+p)}{p^2} \\
     &= \frac{1-p}{p^2}
-\end{align*}
-$$
-
-## 2.2. Continuous Random Variables
-
-We now move to defining the most important _continuous_ RV.
-
-### 2.2.1. Uniform Distribution
-
-A **continuous** RV is said to be **Uniformly Distributed** $X \sim U(a, b)$ if
-its PDF is **constant over an interval** $[a, b]$:
-
-$$
-f(x) = \begin{cases}
-  \frac{1}{b-a} & a\le x\le b \\
-  0 & \text{otherwise}
-\end{cases}
-$$
-
-This kind of distribution models the case when _there is no particular preference
-for one or another value_ within the interval.
-
-We can easily compute the _mean value_:
-
-$$
-\begin{align*}
-  E[X] &= \int_{-\infty}^{+\infty} x f(x) dx \\
-    &= \int_{a}^{b} x \frac{1}{b-a} dx \\
-    &= \frac{1}{b-a} \left[\frac{x^2}{2}\right]_a^b \\
-    &= \frac{1}{b-a} \left(\frac{b^2 - a^2}{2}\right) \\
-    &= \frac{1}{b-a} \left(\frac{(b-a)(b+a)}{2}\right) \\
-    &= \frac{b+a}{2}
-\end{align*}
-$$
-
-In other words, the mean value is the **midpoint of the interval**.
-
-As for the _variance_, we have:
-
-$$
-\begin{align*}
-  E[X^2] &= \int_{-\infty}^{+\infty} x^2 f(x) dx \\
-    &= \int_{a}^{b} x^2 \frac{1}{b-a} dx \\
-    &= \frac{1}{b-a} \left[\frac{x^3}{3}\right]_a^b \\
-    &= \frac{1}{b-a} \left(\frac{b^3 - a^3}{3}\right) \\
-    &= \frac{1}{b-a} \left(\frac{(b-a)(b^2 + ab + a^2)}{3}\right) \\
-    &= \frac{b^2 + ab + a^2}{3}
-\end{align*}
-$$
-
-Hence:
-
-$$
-\begin{align*}
-  \operatorname*{Var}(X) &= E[X^2] - E[X]^2 \\
-    &= \frac{b^2 + ab + a^2}{3} - \left(\frac{b+a}{2}\right)^2 \\
-    &= \frac{4(b^2 + ab + a^2) - 3(b^2 + 2ab + a^2)}{12} \\
-    &= \frac{b^2 - 2ab + a^2}{12} \\
-    &= \frac{(b-a)^2}{12}
-\end{align*}
-$$
-
-It it also easy to compute the CDF:
-
-$$
-F(x) = \int_a^{x}{ \frac{1}{b-a} dx } = \frac{x-a}{b-a} \quad a\le x\le b
-$$
-
-### 2.2.2. Exponential Distribution
-
-A continuous RV is said to be **exponentially distributed** $X \sim Exp(\lambda)$:
-
-$$
-f(x) = \begin{cases}
-  \lambda e^{-\lambda x} & x \ge 0 \\
-  0 & x < 0
-\end{cases}
-$$
-
-Where $\lambda$ is called the **rate parameter**.
-
-One can easily compute the CDF:
-
-$$
-\begin{align*}
-  F(x) &= \int_{-\infty}^{x} f(t) dt \\
-    &= \int_{0}^{x} \lambda e^{-\lambda t} dt \\
-    &= \left[-e^{-\lambda t}\right]_0^x \\
-    &= 1 - e^{-\lambda x} \quad x\ge 0
-\end{align*}
-$$
-
-This function approaches 1 as $x$ goes to infinity, meaning that the _exponential
-variable_ can assume **arbitrarily large numbers** with some _non-zero probability_.
-
-For this reason, this kind of distribution are good models of the **amount of time**
-between events occurring at random.
-
-We can compute the mean value as follows:
-
-$$
-\begin{align*}
-  E[X] &= \int_{-\infty}^{+\infty} x f(x) dx \\
-    &= \int_{0}^{+\infty} x \lambda e^{-\lambda x} dx \\
-    &= \left[-x e^{-\lambda x}\right]_0^{+\infty} +
-\int_{0}^{+\infty} e^{-\lambda x} dx \\
-    &= 0 + \left[-\frac{1}{\lambda} e^{-\lambda x}\right]_0^{+\infty} \\
-    &= 0 + 0 - (-\frac{1}{\lambda}) = \frac{1}{\lambda}
-\end{align*}
-$$
-
-As for the variance, we have:
-
-$$
-\begin{CD}
-\begin{aligned}
-  E[X^2] &= \int_{-\infty}^{+\infty} x^2 f(x) dx \\
-    &= \int_{0}^{+\infty} x^2 \lambda e^{-\lambda x} dx \\
-    &= \left[-x^2 e^{-\lambda x}\right]_0^{+\infty} + 2 \int_{0}^{+\infty} x
-e^{-\lambda x} dx \\
-    &= 0 + 2 \cdot \frac{1}{\lambda} = \frac{2}{\lambda^2}
-\end{aligned} \\
-@VVV \\
-\begin{aligned}
-  \operatorname*{Var}(X) &= E[X^2] - E[X]^2 \\
-    &= \frac{2}{\lambda^2} - \frac{1}{\lambda^2} \\
-    &= \frac{1}{\lambda^2}
-\end{aligned}
-\end{CD}
-$$
-
-The exponential distribution benefits from two properties that make it very
-useful in practice.
-
-The first one is the following:
-
-> Given $n$ **independent** exponential RVs $X_1, \dots, X_n$ whose rates are
-> $\lambda_1, \dots, \lambda_n$, then the **minimum** of these RVs
-> $Y = \min\Set{X_1, \dots, X_n}$ is also an **exponential RV** with rate
-> $\lambda =\sum_{i=1}^{n}{\lambda_i}$.
-
-This can be trivially proven:
-
-$$
-\begin{align*}
-  P\Set{Y \ge a} &= P\Set{\min\Set{X_1, \dots, X_n} \ge a} \\
-    &= P\Set{X_1 \ge a, \dots, X_n \ge a} \\
-    &= P\Set{X_1 \ge a} \cdot ... \cdot P\Set{X_n \ge a} && \text{(independence)}\\
-    &= \prod_{i=1}^{n} P\Set{X_i \ge a} \\
-    &= \prod_{i=1}^{n} e^{-\lambda_i a} \\
-    &= e^{-\sum_{i=1}^{n}{\lambda_i a}} = e^{-\lambda a}
-\end{align*}
-$$
-
-Then, $F_Y(a) = 1 - e^{-\sum_{i=1}^{n}{\lambda_i a}}$.
-
-The second property is the **memoryless property**:
-
-> If $X \sim Exp(\lambda)$, then $\forall t,s \ge 0$ we have that:
->
-> $$
->   P\Set{X \ge t + s \vert X \ge t} = P\Set{X \ge s}
-> $$
-
-Assuming we want to know whether a system with an exponential distributed
-lifetime, that has already worked for $t$ hours, will work for $s$ more hours.
-
-This property tells us that knowing that the system has already worked for $t$ hours
-**does not change the probability** that it will work for $s$ more hours.
-
-Formally:
-
-$$
-\begin{align*}
-  P\Set{X \ge t + s \vert X \ge t} &= \frac{P\Set{X \ge t + s, X \ge t}}
-{P\Set{X > T}} \\
-  &= \frac{P\Set{X \ge t + s}}{P\Set{X \ge t}} \\
-  &= \frac{e^{-\lambda (t+s)}}{e^{-\lambda t}} \\
-  &= e^{-\lambda s} = P\Set{X \ge s}
-\end{align*}
-$$
-
-The exponential distribution is the **only memoryless continuous
-distribution**, much like the _geometric distribution_ is the only memoryless
-discrete distribution.
-
-However, the similarity between the two distributions extends further:
-
-> If $X$ is an _exponential RV_ with a rate $\lambda > 0$, then $Y = \lfloor X \rfloor$
-> is a _geometric RV_ with parameter $p = 1 - e^{-\lambda}$.
-
-In fact:
-
-$$
-\begin{align*}
-  p_Y(k) = P\Set{Y = k} &= P\Set{k \le X < k+1} \\
-    &= F_X(k+1) - F_X(k) \\
-    &= (1 - e^{-\lambda (k+1)}) - (1 - e^{-\lambda k}) \\
-    &= e^{-\lambda k} - e^{-\lambda (k+1)} \\
-    &= e^{-\lambda k} (1 - e^{-\lambda}) \\
-    &= (1 - p)^{k} p
-\end{align*}
-$$
-
-#### 2.2.2.1. Example: lifetime of series components
-
-> Given three subsystems in series $S1$, $S2$ and $S3$, whose lifetimes are
-> _independent exponential RVs_ with rates $\lambda_i$.
->
-> Which is the probability that this system works at time $t$.
-
-This system will stop working when the first subsystem fails, hence:
-
-$$
-\begin{align*}
-  P\Set{S \text{ works at time } t} &= P\Set{X_1 > t, X_2 > t, X_3 > t} \\
-    &= P\Set{\min(X_i) > t} \\
-    &= 1 - F_{min}(t) \\
-    &= e^{-(\lambda_1 + \lambda_2 + \lambda_3) t}
 \end{align*}
 $$
