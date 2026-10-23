@@ -21,6 +21,16 @@ title: Special Continuous Random Variables
       - [2.4.2.1. Example: Class of Students](#2421-example-class-of-students)
   - [2.5. Percentiles](#25-percentiles)
   - [2.6. Chi-Square Distribution](#26-chi-square-distribution)
+  - [2.7. Student's T Distribution](#27-students-t-distribution)
+  - [2.8. Heavy-Tailed Distributions](#28-heavy-tailed-distributions)
+    - [2.8.1. Preferential Attachment](#281-preferential-attachment)
+    - [2.8.2. Pareto Distribution](#282-pareto-distribution)
+    - [2.8.3. Properties of Heavy-Tailed](#283-properties-of-heavy-tailed)
+      - [2.8.3.1. Memory Principle](#2831-memory-principle)
+      - [2.8.3.2. Conspiracy and Catastrophic Events](#2832-conspiracy-and-catastrophic-events)
+      - [2.8.3.3. Scale-Free Property](#2833-scale-free-property)
+    - [2.8.4. Heavy-Tail in action: Load Balancing in an Internet ASs](#284-heavy-tail-in-action-load-balancing-in-an-internet-ass)
+    <!--toc:end-->
 
 # 2. Special Continuous Random Variables
 
@@ -703,3 +713,297 @@ RV**, because of the CLT.
 
 For this distribution, the _mean value_ is $E[X] = k$ and the _variance_ is
 $\operatorname*{Var}(X) = 2k$.
+
+## 2.7. Student's T Distribution
+
+Assuming $Z \sim \mathcal{N}(0,1)$ and $X \sim \chi_n^2$ are **independent** RVs,
+we can _define_ the **Student's T distribution with $n$ degrees of freedom**:
+
+$$
+T_n = \frac{Z}{\sqrt{\frac{\chi_n^2}{n}}}
+$$
+
+<div class="grid2">
+<div class="">
+
+Looking at the denominator, we can say that $\chi_n^2 \over n$ is a RV with
+_mean value_ $1$ and _variance_ $2 \over n$.
+This means that, as $n$ grows larger, the denominator **becomes a constant** of
+value $1$.
+
+This means that:
+
+$$
+\lim_{n\to \infty} T_n = Z \sim \mathcal{N}(0,1)
+$$
+
+As the image on the right shows, we do not need a very large $n$ for the
+distribution to be very close to a standard normal distribution, but a
+$n > 30$ is more than enough to consider $T \sim \mathcal{N}(0,1)$.
+
+In any case, we have that:
+
+- **Mean Value**: $E[T_n] = 0$ for $n > 1$
+- **Variance**: $\operatorname*{Var}(T_n) = \frac{n}{n-2}$ for $n > 2$
+
+These last results confirms that $T \sim \mathcal{N}(0,1)$ for large $n$.
+
+</div>
+<div class="">
+<img class="60" src="./images/special-rv/students-t.png"
+      alt="Student's T Distribution">
+</div>
+</div>
+
+Notably, we can find **high percentiles** $t_{\alpha, n}$ of the Student's T distribution,
+which are used in _confidence intervals_ and _hypothesis testing_.
+
+In fact, the value $t_{\alpha, n}$, for which $P\Set{T_n > t_{\alpha, n}} = \alpha$,
+is a number that **decreases with** $n$.
+
+In general it is an **upper bound** of the _percentile_ $z_\alpha$ of the
+standard normal distribution, and it approaches it when $n$ grows larger.
+
+## 2.8. Heavy-Tailed Distributions
+
+We define a **heavy tailed distribution** one whose _(right) tail_ **_decays
+slower than an exponential_**.
+
+The main consequence of these kind of distributions is that "very large" values
+(with respect to the mean) are still unlikely, but **not vanishingly unlikely**
+(_negligible_).
+
+The most common Heavy Tail (HT) definition is the **Sub-exponential Distribution's
+definition**:
+
+$$
+\forall \lambda > 0, \quad
+\lim_{x\to \infty} e^{\lambda x} (1 - F(x)) = \infty
+$$
+
+_Sub-exponential distributions_ are a subset of heavy-tailed distributions:
+
+$$
+  SubEx \subset LongT \subset HT
+$$
+
+However, most HT TVs of interest are _sub-exponential_, so we will use the collective
+name HT and forget about the distinction (we are not mathematicians).
+
+To be fair, we already encountered a HT distribution: the **Pareto distribution**.
+
+$$
+f(x) = \begin{cases}
+  0 & x \le 100 \\
+  \frac{100}{x^2} & x > 100
+\end{cases}
+$$
+
+In this case we have:
+
+$$
+F(x) = \int_{100}^x{\frac{100}{y^2}\;dy} =
+\left[-\frac{100}{y}\right]_{100}^x = 1 - \frac{100}{x}
+$$
+
+Since:
+
+$$
+\lim_{x\to \infty} e^{\lambda x} (1 - F(x)) =
+  \lim_{x\to \infty} e^{\lambda x} \frac{100}{x} = \infty
+$$
+
+This is a **Heavy-Tailed distribution**.
+
+HT distribution are just **everywhere** in real life. This is a problem
+for us simple humans, because we "want" things to be "Normal". A possible
+explanation of this is that we are _evolutionarily_ adapted to deal with
+Normal(ish) phenomena, like _physical phenomena_.
+
+However, **information** and **social phenomena**, which have appeared only
+very recently in our evolutionary history, often exhibit HT behavior.
+
+We saw how if we sum _iid light-tailed RVs_ we get a _Normal RV_ (CLT),
+however if we multiply _iid light-tailed RVs_ we get a _Heavy-Tailed RV_.
+This is exactly why HT RVs appear so often is that they are the **natural
+outcome of _multiplicative processes_**.
+
+_Multiplicative processes_ appear whenever something **grows proportionally
+to its size**, like _interest rates_, _population size_, _information_,
+_preferential attachment_, etc.
+
+### 2.8.1. Preferential Attachment
+
+**Preferential attachment** (or _rich-get-richer principle_) is a phenomenon that
+appears in _social networks_ and _information networks_.
+
+Consider a set of YouTube videos. Their popularity is measured by the number
+of views they have, and the more popular a video is, the more likely it is to
+be recommended to other users.
+
+Therefore, the probability that a _new_ user watches a video is skewed towards the
+most popular videos, which will become even more popular.
+
+It is possible to see this phenomena by opening the home page of YouTube and
+see that most of the recommended videos are in the order of _millions of
+views_, while the mean value of all the YouTube videos is in the order of _thousands_.
+
+This kind of behaviour is unthinkable in a _Normal world_, where the
+probability of having a video with a number of views that is _thousands of
+times larger than the mean_ is _vanishingly small_.
+
+Preferential attachment explains the HT distribution of many phenomena, such as:
+
+- **Internet connectivity**: the number of connections of an Autonomous System
+  is typically an HT. If we are a _new Internet Service Provider_, and we want to
+  select a good backbone provider, we are more likely to choose a well-connected
+  one, rather than building our own small one.
+- **Size of cities**: The more people live in a city, the better the opportunities
+  and services are likely to be, which is something that _attracts even more people_.
+- **Income distribution**: in a free-market society the more money you have, the
+  more you can invest into making more money. Since investment returns are
+  _multiplicative_, you will get _higher returns_, and the phenomenon is
+  self-sustaining.
+
+Several quantities related to **Computer Engineering** follow HT distributions:
+
+- **Lifetime of Unix Processes**: the longer a process has been running,
+  the more likely it is to keep running.
+- **Number of packets in IP flows**: it is the so-called _mice-and-elephants_ phenomenon,
+  where most flows are _mice_ (few packets, like DNS queries), but a few flows are
+  _elephants_ (millions of packets).
+- **Social-Network Phenomena**: for example the number of followers or the
+  number often likes of a user. This is the reason why _influencers_ exist.
+
+### 2.8.2. Pareto Distribution
+
+The general form of the Pareto distribution is:
+
+$$
+\begin{align*}
+F(X) &= 1 - \left(\frac{x_m}{x}\right)^\alpha
+f(X) &= \frac{\alpha(x_m)^\alpha}{x^{\alpha + 1}}
+\end{align*}
+$$
+
+With $x_m > 0$, $\alpha > 0$ and $x \ge x_m$.
+
+It is easy to calculate the _mean value_:
+
+When $\alpha \le 2$ the **variance is infinite**, and if $\alpha \le 1$ also
+the **mean is infinite**.
+
+### 2.8.3. Properties of Heavy-Tailed
+
+HT distributions have some _peculiar characteristics_ that sets them apart from
+_light-tailed distributions_.
+
+#### 2.8.3.1. Memory Principle
+
+The first one is the **Memory Principle**.
+
+We saw how:
+
+- _Exponential RVs_: $P\Set{X > s + t \vert X > t} = P\Set{X > s}\to$ the
+  passage of time is **irrelevant** to the happening of events.
+- _Light-Tailed RVs_: $P\Set{X > s + t \vert X > t} < P\Set{X > s}\to$ the more
+  time it passes, the **more likely** it is for an event to happen.
+
+For HT RVs we have the opposite:
+
+$$
+\large
+P\Set{X > s + t \vert X > t} > P\Set{X > s}
+$$
+
+Meaning that the **more time it passes**, the **lower the chances** for it
+to happen become.
+
+We can check this property with a _Pareto RV_:
+
+$$
+P\Set{X > s + t \vert X > t} = \frac{P\Set{X > s + t}}{P\Set{X > t}}
+  = \frac{\left(\frac{x_m}{s+t}\right)^\alpha}{\left(\frac{x_m}{t}
+\right)^\alpha} = \left(\frac{t}{s+t}\right)^\alpha
+$$
+
+When $t$ is large, we the above expression **converges to** $1$, meaning
+that an event which did not happen for a long time $t$, is certain to never
+happen even if we wait more time $s$.
+
+#### 2.8.3.2. Conspiracy and Catastrophic Events
+
+If we have a _very large value_ for the **sum of light-tailed RVs**, it is
+likely to be a **Conspiracy**, meaning that all the RVs will have a
+_similar large value_.
+
+An example could be if we know that in a room there are 10 people, and we know that
+the average height is $2m$.
+
+It is more reasonable to assume that all the people are _tall_ (like a
+basketball team) rather than thinking to have a $4\;m$ tall person in the room with
+9 average-height people.
+
+With **heavy-tailed RVs**, in the same case we are more prone to talk
+about a **Catastrophic Event**, meaning that it is more probable for just **one
+of the RVs** to have a _very large value_, while the others are _small_.
+
+An example could be if we know that in a room there are 10 people, and we know that
+the average _net-worth_ is $2B$€. It is more reasonable to assume that one
+person is a billionaire, while the others are _poor_, rather than thinking
+that all the people are _moderately-rich_.
+
+In numbers this property can be formulated as:
+
+$$
+\lim_{x\to\infty} \frac{P\Set{X_1 + \cdots + X_n  > x}}
+{P\Set{\max{(X_1, \dots, X_n)} > x}} = 1
+$$
+
+#### 2.8.3.3. Scale-Free Property
+
+With LT RVs the _mean value_ is a good representative of a typical observation.
+
+Instead, for HT RVs it is quite hard to tell what the "typical" scale is,
+since the possible values are likely to span several orders of magnitude, since
+very large values are uncommon, but **not vanishingly unlikely**.
+
+Making a `log-log` plot of the PDFs of a _Normal_, an _Exponential_ and a
+_Pareto_ distribution, we can see that the first two decay _way faster than
+any power law_, while the Pareto distribution decays _exactly as a power law_.
+
+<img class="40" src="./images/special-rv/scale-free.png"
+      alt="Scale-Free Property">
+
+### 2.8.4. Heavy-Tail in action: Load Balancing in an Internet ASs
+
+It has been observed that the size of TCP flows in an Internet Autonomous System
+is **heavy-tailed**.
+
+This means that there are:
+
+- **Many mice**: insignificant flows, like DNS queries, which transmit few bytes.
+- **Very few elephants**: significant flows, like video streaming, which transmit
+  millions of bytes that make bulk of the traffic.
+
+To load balance this kind of traffic we first keep in mind that _re-routing a flow
+has a cost_, so we have to find the _ideal way to do it_.
+
+A _cheap and effective_ scheme would be to **reroute some of the elephants**, since
+it is:
+
+- **Effective**: by moving one _elephant_ we move a large portion of the traffic
+- **Cheap** since we have few _elephants_, there will be very _few rerouting decisions_
+  will need to be made.
+
+The problem now is to **identify the elephants**.
+
+To do so we can **rely on the memory principle**:
+
+1. We start to think every packet is a mice, and keep trace of a (empirical) threshold
+2. If, after the threshold, a packet is still being transmitted, we can assume it
+   is an elephant
+3. We re-route the packet.
+
+If instead things were _Normal_, all packtes would be approximately the same size,
+so the answer would be to reroute half the traffic.
