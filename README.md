@@ -73,6 +73,7 @@ Requirements for the course are:
 1. [RVs Mode Mean and Variance](./RVs%20Mode%20Mean%20and%20Variance)
 1. [Special Discrete Random Variables](./Special%20Discrete%20Random%20Variables)
 1. [Special Continuous Random Variables](./Special%20Continuous%20Random%20Variables)
+1. [Statistics](./Statistics)
 
 ### Simulations (Nardini)
 
