@@ -22,7 +22,21 @@ title: Systems and Simulations
     - [3.6.1. Trace-Driven Simulations](#361-trace-driven-simulations)
     - [3.6.2. Self-Driven Simulations](#362-self-driven-simulations)
     - [3.6.3. Empirical Distribution Simulations](#363-empirical-distribution-simulations)
-      <!--toc:end-->
+  - [3.7. Simulation Analysis](#37-simulation-analysis)
+    - [3.7.1. Case Study: VoIP in 5G Network](#371-case-study-voip-in-5g-network)
+      - [3.7.1.1. Defining the Objectives and Performance Indicators](#3711-defining-the-objectives-and-performance-indicators)
+      - [3.7.1.2. Modeling the System](#3712-modeling-the-system)
+      - [3.7.1.3. Validating the Model](#3713-validating-the-model)
+      - [3.7.1.4. Defining the Factors](#3714-defining-the-factors)
+      - [3.7.1.5. Select the Simulation Tool](#3715-select-the-simulation-tool)
+      - [3.7.1.6. Implementation](#3716-implementation)
+      - [3.7.1.7. Verification](#3717-verification)
+        - [3.7.1.7.1. Fingerprinting](#37171-fingerprinting)
+        - [3.7.1.7.2. Rubber-Duck Debugging](#37172-rubber-duck-debugging)
+        - [3.7.1.7.3. Statistical Verification](#37173-statistical-verification)
+        - [3.7.1.7.4. Usage of Animations and Graphs](#37174-usage-of-animations-and-graphs)
+        - [3.7.1.7.5. Consistency, Degeneracy and Continuity Checks](#37175-consistency-degeneracy-and-continuity-checks)
+        <!--toc:end-->
 
 # 2. Systems
 
@@ -573,3 +587,330 @@ In this case, the approach is the following:
 
 As we said, this is a last-resort approach, since it is difficult to validate
 and it is not flexible nor scalable.
+
+## 3.7. Simulation Analysis
+
+Simulation, as any other engineering practice, has a **workflow**, a set of
+action to be taken.
+
+These are very important, since they allow us to **validate** the simulation.
+
+It's not a secret that some of the steps of the workflow are _boring_,
+especially if they cannot be automated and we have to do them manually.
+
+Exactly for this reason, simulation analysis is **costly and error prone**.
+
+The workflow addresses the following steps:
+
+1. Identify the **objective** of the simulation
+1. Identify the **Key Performance Indicators** (KPIs) we want to measure
+1. Choose the correct **model** for the system
+1. Understand the **factors** that influence the system
+1. **Validate** the model, comparing it with a real system or an analytical model
+1. Select the **tool** to actually implement the simulation (`OmNeT++` in our case)
+1. Actually **implement the simulator**.
+1. Verify the simulator, checking that it works as expected and that it is
+   free of bugs
+1. **Calibrate** the parameters of the simulator
+1. Design the **experiments** to be run,
+1. **Run** the experiment and **analyze** the results
+
+### 3.7.1. Case Study: VoIP in 5G Network
+
+User Equipments (UEs) establish a **Voice-over-IP (VoIP)** communication with
+their respective remote endpoint.
+
+The final user's Quality of Experience (QoE) is determined by _throughput_,
+_end-to-end latency_, _jitter_, _packet loss_, etc...
+
+In this architecture, the 5G Radio Access Network pays a big role in determining
+the final performance.
+
+Every **Transmission Time Interval (TTI)**, each _base station_ allocates
+mutually exclusive **Resource Blocks (RBs)** to the UEs in its coverage area
+based on their **channel quality**.
+
+In 5G networks, TTI is $1\;ms$ and the RBs are allocated in a **time-frequency grid**,
+where each RB is $180\;kHz$ wide.
+
+The problem is that neighboring base stations **use the same frequency
+spectrum**, meaning that transmissions from neighboring base stations can interfere
+with each other, **degrading the performance**.
+
+Hence, it is necessary to **coordinate the RB allocation** among neighboring base
+stations.
+
+> [!note]
+> These informations where only given to us to understand the problem, but we
+> will not go into the details of how 5G networks work, since it is not the
+> focus of this course.
+
+#### 3.7.1.1. Defining the Objectives and Performance Indicators
+
+The first step is to **define the objectives** of the simulation.
+
+We are searching for a **SMART** objective (_Specific, Measurable, Achievable, Relevant
+and Time-bound_), since they help us to plan the necessary **time**, **manpower**
+and **skill** needed for project.
+
+_"I want to simulate the 5G network"_ is not an objective, since it does not
+specify an achievable goal, nor it is specific in what it actually means.
+
+Instead, in our case study the objective is:
+
+> Study the benefits of different 5G network's interference mitigation
+> techniques on VoIP performance.
+
+Once we defined the objective, we need to identify the **Key Performance Indicators
+(KPIs)**.
+
+As we could expect, they are measurable metrics heavily dependent on the objectives.
+
+For our case study, they are related to "studying the benefits", meaning
+understanding which techniques is _better_ than the others, hence:
+
+> Which techniques achieves a higher end-to-end throughput and/or a lower latency.
+
+#### 3.7.1.2. Modeling the System
+
+Building a model of the system is one of the most important steps in the simulation
+workflow, as well as one of the **most difficult**.
+
+Modeling allows us to _abstract some unnecessary details_, and includes the possibility
+to model the system through **many sub-models**, each of which can be simulated
+independently.
+
+For our case study possible decision points are related on:
+
+- **Router/Base Station sub-model**: choosing whether it should process delay, queuing,
+  implement CRC/checksum, etc...
+- **Link sub-model**: choosing whether it should implement a _propagation delay_,
+  if it should allow for _bit corruption_
+- **Encoding/Decoding sub-model**: choosing whether it should implement a
+  _computation delay_, if to use _buffers_ and which are their sizes
+
+More in general, a typical simulation model follows the following paradigm:
+
+1. Identify the **entities** of the system (packets in our case)
+1. Identify the **generators** and the **sink** of the entities (the source
+   and destination of packets in our case)
+1. Identify the **routes** of the entities (the path packets take in our case)
+1. Identify the **queueing nodes**, where entities can stop waiting for something
+   to happen (the base stations in our case)
+1. Identify the **service nodes**, where entities can be processed (the base stations
+   in our case)
+1. Identify the **resources** that the entities need to use (the RBs in our case)
+1. Identify the **Contextual Information** that can influence the system (the channel
+   quality or the user position in our case)
+
+> [!IMPORTANT]
+> When making any **assumption** about the system, it is **mandatory** (not really,
+> just really good practice) to **justify it** and record it in an **_Assumption
+> Document_**.
+
+Modeling is a _fine art_. We should find a balance between _too much abstraction_,
+which make the model less reliable, and _too much detail_, which make the
+model too complex to be simulated.
+
+There is also the subtlety of **upgradability** of the model, meaning the
+possibility to **easily add/remove features/parameters** to the model.
+
+#### 3.7.1.3. Validating the Model
+
+**Models _need to be validated_** to ensure that they correctly represent the
+system for which the stand in.
+
+Validating a model means **verifying that the assumption made lead to something
+that _behaves as similarly as possible to the real system_**.
+
+Validation can be done using three techniques:
+
+- **Expert Intuition**: we can ask an expert of the system to evaluate the model
+  and give feedback on its correctness. This is a _cheap_ and _quick_ way to
+  validate a model, but it is not very reliable.
+- **Real System Measurements**: we can compare the output of the model with
+  the output of the real system. This is a _reliable_ way to validate a model,
+  but it is not always possible to do so.
+- **Theoretical Result**: we can compare the output of the model with the output
+  of an analytical model. This is a _reliable_ way to validate a model, but it
+  is not always possible to do so.
+
+In general validation is a continuous process, that happens during the whole simulation
+workflow.
+
+The _Preliminary Validation_, done before the actual validation, is just a
+weak check of the model against the system.
+
+Instead, the _Final Validation_ is a strong check for the (already verified) code
+against the system.
+
+<img class="" src="./images/simulation/validation-workflow.png"
+      alt="Validation Workflow">
+
+#### 3.7.1.4. Defining the Factors
+
+A **factor** is a variable that can influence our system.
+
+For example, in our case the _number of users_ is a factor, since:
+
+- With 1 user we will have _no interference_
+- With 2 users we will have possible _interference_ and _resource competition_
+- With 1000 users we will be sure to have _interference_ and _resource competition_
+
+Some factors are **controllable**, meaning that we can set them to a specific
+value, while some factors are **uncontrollable** and often follow some Random
+Variable distribution.
+
+In the case of our 5G network, some of the factors we can define are:
+
+- The **application traffic model**. This is a **qualitative** (i.e., not
+  quantitative) factor.
+- The **number of base stations or users** on which we want to test the VoIP
+  performance, which is instead a **quantitative** factor
+- The **queue size** at the base station side, which is quantitative
+- The **interference mitigation algorithm** (seeing as we want to compare some of
+  them using simulation), which is not quantitative again.
+
+> [!note]
+> Factors can make us **change the model** we are using.
+> However, changing the model **can changes the unfixed factors**.
+
+#### 3.7.1.5. Select the Simulation Tool
+
+Once we have a clear idea of what we are going to do, we need to select the
+**most suitable simulation tool** for our case study.
+
+There are several alternatives from which we can choose:
+
+- **Ready-Made simulators**: they are simulators that have already been
+  implemented and are ready to use. They are often very specific to a certain
+  domain, and can be very efficient for that domain. However, they are not
+  flexible and cannot be easily adapted to other domains. Also, they often have
+  a steep learning curve and can be costly.
+- **Simulation-Oriented Frameworks**: they are frameworks that provide a set
+  of libraries and tools that can be used to implement simulators. They often
+  provide a set of abstractions that can be used to implement simulators.
+  However, they are not as efficient as ready-made simulators and require more
+  effort to implement a simulator. (e.g., `Simulink`, `Arena`, ...)
+- **Simulation-Oriented Programming Languages**: they are programming
+  languages that have been designed to facilitate the implementation of
+  simulators. They often provide a set of libraries and tools that can be used
+  to implement simulators. However, they are not as efficient as ready-made
+  simulators and require more effort to implement a simulator.(e.g., `Simula`, ...)
+- **General-Purpose Programming Languages**: they are programming languages
+  that can be used to implement simulators. They are often very flexible and can
+  be used to implement simulators for any domain. However, they require more
+  effort to implement a simulator and are not as efficient as ready-made simulators.
+  (e.g, `C++`, `Java`, ...)
+
+For the purpose of this course the choice is "forced" to use the `OmNeT++` framework,
+which is a **general-purpose discrete event simulator**.
+
+#### 3.7.1.6. Implementation
+
+Coding must be state-of-the-art, meaning that we must use the best practices of
+software engineering.
+
+If using a simulation framework, we must use the **best practices** of that framework.
+
+However, any coding should follow the best practices of software engineering
+and programming:
+
+- Perform **extensive debugging** and **unit testing** of the code
+- Use **Anti-bugging** techniques to avoid common mistakes and pitfall. A techniques
+  could be to _add specific code that checks for specific conditions_
+  (`assert` statements, `if` statements, ...) that **raise exceptions** when the
+  condition is not met.
+
+#### 3.7.1.7. Verification
+
+When we produced a code that doesn't crash we **are still far from being done**.
+
+Now the verification step takes place, which is to **verify that the code
+_correctly implements the model_**.
+
+It is usually the **hardest, longest and most boring** step of the whole
+simulation workflow, since we **don't know what is expected and what is not**.
+
+> [!caution]
+> Never **ever** start running simulation before terminating this part, as we will
+> definitely find some "logical bug" and will be forced to throw away all
+> everything we > have done and start over.
+
+Part of the verification consists in **running simple scenarios** of growing
+complexity, whose results can be _verified manually_.
+
+In this scenario, we are able to manually compute the results meaning we can
+_hard-code_ the expected results in the code and check that the simulation produces
+the expected output.
+
+After the simulation passes these kind of verification, we can start complicating
+the scenario by adding more factors, and check that the simulation still
+produces the expected outputs.
+
+##### 3.7.1.7.1. Fingerprinting
+
+It is also possible to use several more advanced techniques to verify the correctness
+of the simulation, like **fingerprinting**.
+
+**Fingerprinting** is a technique that allows us to **verify the correctness
+of the simulation** by comparing the output of the simulation with a known
+good output.
+
+This is done by extracting an _hash_ (_fingerprint_) out of a known good
+result, and use it as a **reference** to compere the future outputs of the simulation.
+
+##### 3.7.1.7.2. Rubber-Duck Debugging
+
+**Rubber-Duck Debugging** is a structured walk-through technique that helps
+the programmer understand the behavior of the code and find bugs.
+
+It follows the idea that for truly understand something, we should be able to
+explain it to someone else (for example a rubber-duck).
+
+This process, if used alongside **event traces** (like log files, or simply
+trace outputs) we can _trace_ what our code actually did.
+
+Of course this can also benefit from using a **_debugger_** to step through the
+code and inspect the state of the simulation at each step.
+
+##### 3.7.1.7.3. Statistical Verification
+
+When we are simulating a system that has **stochastic behavior**, we need to
+be careful when verifying the correctness of the simulation.
+
+In these cases, the implementation of the model may be correct, but still
+produce **wrong results**.
+
+This could happen because of _bugs in statistic computations_.
+
+For example, using a non-full-period LCG or using the same stream for different
+purpose generator could affect the whole simulation.
+
+There is not a standard way to verify the correctness of a simulation with
+stochastic behavior, but we can use _common-sense_ and _try-and-error_ to check
+that the results are reasonable and follow the theoretical expectations.
+
+##### 3.7.1.7.4. Usage of Animations and Graphs
+
+Some simulation frameworks, for example `OmNeT++`, provide **animations** and
+**graphs** to visualize what is actually happening in the simulation.
+
+This makes easier for us to _spot odd behavior_, increasing the chances to find
+bugs in the code.
+
+##### 3.7.1.7.5. Consistency, Degeneracy and Continuity Checks
+
+**Consistency Checks** are checks that verify that the simulation is
+consistent in similar scenarios. For example, the system should behave the
+same way either if we have one source sending at 100 kbps or two sources
+sending at 50 kbps each.
+
+**Degeneracy Checks** are checks that verify that the simulation still holds
+even in limit-case scenarios. For example with _zero error rate_, _zero
+propagation time_, _infinite queues_, _zero users_, ...
+
+**Continuity Checks** are checks that verify that the simulation behaves
+continuously when we change the parameters of the system. For example, if we
+increase the number of users from 1 to 2, the performance should not change
+drastically, like if we increased the user by 1000x.
