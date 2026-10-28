@@ -85,16 +85,14 @@ Requirements for the course are:
 These are personal notes, and are to be used for educational purpose only.
 
 The notes are based on Performance Evaluation of Computer Systems A.Y.
-2026-2027 lessons, teached by Prof. Giovanni Stea and Prof. Giovanni
+2026-2027 lessons, taught by Prof. Giovanni Stea and Prof. Giovanni
 Nardini, and on the notes handed by the professors and available on
-the official temas and course website.
+the official Teams and course website.
 I do not grant accuracy, completeness or updating.
 These are not official notes, and don't replace lessons or official educational
 material handed by the professors.
-didattico fornito dal professore.
 
 For any doubt, refer to official course material and professors instructions.
-alle indicazioni del docente.
 
 If you spot errors, you can report them either by GitHub issue or by contacting
 the author directly.
@@ -102,4 +100,4 @@ the author directly.
 ## 📄 License
 
 This work is protected by copyright.
-Se [LICENSE](./LICENSE) for further details.
+See [LICENSE](./LICENSE) for further details.

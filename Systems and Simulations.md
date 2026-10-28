@@ -24,19 +24,23 @@ title: Systems and Simulations
     - [3.6.3. Empirical Distribution Simulations](#363-empirical-distribution-simulations)
   - [3.7. Simulation Analysis](#37-simulation-analysis)
     - [3.7.1. Case Study: VoIP in 5G Network](#371-case-study-voip-in-5g-network)
-      - [3.7.1.1. Defining the Objectives and Performance Indicators](#3711-defining-the-objectives-and-performance-indicators)
-      - [3.7.1.2. Modeling the System](#3712-modeling-the-system)
-      - [3.7.1.3. Validating the Model](#3713-validating-the-model)
-      - [3.7.1.4. Defining the Factors](#3714-defining-the-factors)
-      - [3.7.1.5. Select the Simulation Tool](#3715-select-the-simulation-tool)
-      - [3.7.1.6. Implementation](#3716-implementation)
-      - [3.7.1.7. Verification](#3717-verification)
-        - [3.7.1.7.1. Fingerprinting](#37171-fingerprinting)
-        - [3.7.1.7.2. Rubber-Duck Debugging](#37172-rubber-duck-debugging)
-        - [3.7.1.7.3. Statistical Verification](#37173-statistical-verification)
-        - [3.7.1.7.4. Usage of Animations and Graphs](#37174-usage-of-animations-and-graphs)
-        - [3.7.1.7.5. Consistency, Degeneracy and Continuity Checks](#37175-consistency-degeneracy-and-continuity-checks)
-        <!--toc:end-->
+    - [3.7.1.1. Defining the Objectives and Performance Indicators](#3711-defining-the-objectives-and-performance-indicators)
+    - [3.7.1.2. Modeling the System](#3712-modeling-the-system)
+    - [3.7.1.3. Validating the Model](#3713-validating-the-model)
+    - [3.7.1.4. Defining the Factors](#3714-defining-the-factors)
+    - [3.7.1.5. Select the Simulation Tool](#3715-select-the-simulation-tool)
+    - [3.7.1.6. Implementation](#3716-implementation)
+    - [3.7.1.7. Verification](#3717-verification)
+      - [3.7.1.7.1. Fingerprinting](#37171-fingerprinting)
+      - [3.7.1.7.2. Rubber-Duck Debugging](#37172-rubber-duck-debugging)
+      - [3.7.1.7.3. Statistical Verification](#37173-statistical-verification)
+      - [3.7.1.7.4. Usage of Animations and Graphs](#37174-usage-of-animations-and-graphs)
+      - [3.7.1.7.5. Consistency, Degeneracy and Continuity Checks](#37175-consistency-degeneracy-and-continuity-checks)
+      - [3.7.1.8. Calibrating the Simulator](#3718-calibrating-the-simulator)
+      - [3.7.1.9. Experiment Design](#3719-experiment-design)
+      - [3.7.1.10. Running Simulations](#37110-running-simulations)
+      - [3.7.1.11. Data Collection and Analysis](#37111-data-collection-and-analysis)
+      <!--toc:end-->
 
 # 2. Systems
 
@@ -835,7 +839,7 @@ simulation workflow, since we **don't know what is expected and what is not**.
 > [!caution]
 > Never **ever** start running simulation before terminating this part, as we will
 > definitely find some "logical bug" and will be forced to throw away all
-> everything we > have done and start over.
+> everything we have done and start over.
 
 Part of the verification consists in **running simple scenarios** of growing
 complexity, whose results can be _verified manually_.
@@ -914,3 +918,116 @@ propagation time_, _infinite queues_, _zero users_, ...
 continuously when we change the parameters of the system. For example, if we
 increase the number of users from 1 to 2, the performance should not change
 drastically, like if we increased the user by 1000x.
+
+#### 3.7.1.8. Calibrating the Simulator
+
+In a simulator there are several **configuration variables** that needs to be given
+a value.
+
+The set of all configuration variables is called **simulation scenario**, and
+it is made of _factors_ and _configuration parameters_, with these that
+will be kept constant.
+
+Scenarios must be **carefully engineered** to ensure that the simulation
+mirrors real-life-like operating conditions.
+
+Regarding realism, we need to **calibrate** the simulator to ensure that it
+behaves as close as real-life as possible. For example, it makes no sense to
+test connections with 60 hops, since they are never that long.
+
+In our use case, we can calibrate the simulator by using **realistic values**
+for the _number of base stations_, knowing that one single BS will cause no
+interference, while a low number (or a two big one) will not access the impact
+of interference as the real system.
+
+Between all the parameters, two have to be considered very carefully:
+
+- Simulation Duration
+- Warm-up time
+
+#### 3.7.1.9. Experiment Design
+
+As we said before, factors can change the model we are using. Thus, we have to
+verify that the model is able to support at least the **range of values of interest
+(levels)** we want to test for each factor.
+
+Note that, having two factors $n_1$ and $n_2$ values each, we would need to run
+$n_1 \cdot n_2$ simulations to test all the combinations of values.
+
+This is clearly not possible when the number of factors grows beyond a few nits.
+
+Hopefully, we can **reduce the number of factors** by using _common-sense_, removing
+combinations that are not interesting or not realistic.
+
+However, this phase is **generally one of the most difficult** to do. Its
+importance is not negligible, since it is exactly in this phase that we establish
+the possible outputs of the simulation and the scenario it will run on.
+
+There are known techniques that can help reducing the number of factors, like $2^kr!$
+analysis, which tells us at a reasonable price which factors have the highest impact
+on performance.
+
+#### 3.7.1.10. Running Simulations
+
+Running simulations **take time**. For this reason it's important to
+know beforehand which scenario we want to test and if parameters are set
+to the right values and mutually consistent.
+
+There are several reason why the simulation might take a long time to run, like:
+
+- Hardware used to host the simulation
+- Type/Number of recorded statistics
+- Logging
+
+For instance, we might want to disable anti-bugging and trace-logging features when
+running real simulations, as in this phase all bugs **must have already been corrected**.
+
+For large simulation campaigns it can be useful to run simulations in _parallel_
+over multiple machines:
+
+- **Parallel Discrete-Event Simulation (PDES)**: the simulation is split into multiple
+  parts, each of which is run on a different machine. The machines communicate with
+  each other to synchronize the simulation.
+- **Multiple Replications in Parallel (MRIP)**: the simulation is run multiple times
+  in parallel, each time with different random seeds. This allows us to obtain a
+  better estimate of the performance metrics.
+
+Of course, these techniques should not be implemented by hand, but rather
+using a simulation automation software that does this for us.
+
+This before Parallel and Distributed Simulation is an active research field, which
+we will not deal with for now.
+
+Instead, we will focus on **Multiple Replications in Parallel**, which is a simpler
+approach in which each simulation is done independently on different _CPU cores_,
+allowing us to obtain more results in the same time.
+
+#### 3.7.1.11. Data Collection and Analysis
+
+When we deal with large simulations, we produce **large amounts of data**
+(it is not uncommon to produce in the order of hundreds of MB) that needs to
+be collected and analyzed.
+
+The results for each run of the simulation are produced starting from different
+scenarios, so its not enough just to save the results of each run in different files,
+but we also need a way to draw relations between them and the scenarios they were
+produced from.
+
+A first approach can be to use a file-system-based approach, where we save the various
+files in specific directories, and use a naming convention to relate the
+files to the scenarios.
+
+However, this is utterly error-prone, and it is very easy to lose track of the files
+and their relations.
+
+Thus, the correct solution is either to **use a database** or, if possible, to
+**use a simulation framework that helps us to automate this phase**.
+
+After collecting the data, we need to analyze it to obtain the
+**performance indices**.
+These will be used to produce visuals (_graph_, _tables_, _animations_, ...) to
+sustain the conclusions of the simulation.
+
+In this part our task is not to generate _numbers_, but to generate **insights**,
+trying to show why our results are what they are, and how they have actually
+improved the system.
