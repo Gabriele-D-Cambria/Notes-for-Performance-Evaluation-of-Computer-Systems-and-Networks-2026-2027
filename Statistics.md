@@ -167,7 +167,7 @@ We can see how \_increasing $q$ has three main effects:
 
 - It **decreases** the _Lower Bound_ of the delay, which is the **minimum
   delay** we can expect.
-- **It**
+- It **increases** the _variance_ of the delay
 
 </div>
 <div class="">

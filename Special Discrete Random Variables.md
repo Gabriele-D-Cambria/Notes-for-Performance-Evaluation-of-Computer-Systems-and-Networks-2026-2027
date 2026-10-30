@@ -241,7 +241,7 @@ $$
   &= \sum_{i=0}^{k} P\Set{X_1 = i} \cdot P\Set{X_2 = k-i} && \text{(independence)}\\
   &= \sum_{i=0}^{k} \left[\frac{\lambda_1^i}{i!} \cdot e^{-\lambda_1} \cdot
   \frac{\lambda_2^{k-i}}{(k-i)!} \cdot e^{-\lambda_2}\right]
-&& \text{(we can multiply both num and div by ) k!} \\
+&& \text{(we can multiply both num and div by }k!\text{)} \\
   &= \frac{e^{-(\lambda_1 + \lambda_2)}}{k!} \cdot \sum_{i=0}^{k} \left[
 \frac{\lambda_1^i}{i!} \cdot \frac{\lambda_2^{k-i}}{(k-i)!} \cdot k!
 \right] \\

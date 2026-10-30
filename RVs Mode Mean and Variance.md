@@ -477,7 +477,7 @@ Some properties of the covariance are:
 
 - **Commutative**: $\operatorname*{Cov}(X, Y) = \operatorname*{Cov}(Y, X)$
 - $\operatorname*{Cov}(X, X) = \operatorname*{Var}(X)$
-- $\Cov(X, Y) = 0$ if $X$ and $Y$ are independent.
+- $\operatorname*{Cov}(X, Y) = 0$ if $X$ and $Y$ are independent.
 
 From the last property, we can see that **if $X$ and $Y$ are independent _the
 variance of their sum is the sum of the variances_**.

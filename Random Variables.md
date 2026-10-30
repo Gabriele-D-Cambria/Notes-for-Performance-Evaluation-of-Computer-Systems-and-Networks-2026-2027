@@ -137,6 +137,7 @@ For a **discrete RV**, the CDF is a **staircase function**.
 
 The first step, as said by the professor, is to:
 
+> [!IMPORTANT]
 > **_DRAW THE BLOODY FUNCTION_**
 
 In this case the plot is the following:
