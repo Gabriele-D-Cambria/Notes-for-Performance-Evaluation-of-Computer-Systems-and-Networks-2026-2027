@@ -22,24 +22,32 @@ title: Systems and Simulations
     - [3.6.1. Trace-Driven Simulations](#361-trace-driven-simulations)
     - [3.6.2. Self-Driven Simulations](#362-self-driven-simulations)
     - [3.6.3. Empirical Distribution Simulations](#363-empirical-distribution-simulations)
-  - [3.7. Simulation Analysis](#37-simulation-analysis)
-    - [3.7.1. Case Study: VoIP in 5G Network](#371-case-study-voip-in-5g-network)
-    - [3.7.1.1. Defining the Objectives and Performance Indicators](#3711-defining-the-objectives-and-performance-indicators)
-    - [3.7.1.2. Modeling the System](#3712-modeling-the-system)
-    - [3.7.1.3. Validating the Model](#3713-validating-the-model)
-    - [3.7.1.4. Defining the Factors](#3714-defining-the-factors)
-    - [3.7.1.5. Select the Simulation Tool](#3715-select-the-simulation-tool)
-    - [3.7.1.6. Implementation](#3716-implementation)
-    - [3.7.1.7. Verification](#3717-verification)
-      - [3.7.1.7.1. Fingerprinting](#37171-fingerprinting)
-      - [3.7.1.7.2. Rubber-Duck Debugging](#37172-rubber-duck-debugging)
-      - [3.7.1.7.3. Statistical Verification](#37173-statistical-verification)
-      - [3.7.1.7.4. Usage of Animations and Graphs](#37174-usage-of-animations-and-graphs)
-      - [3.7.1.7.5. Consistency, Degeneracy and Continuity Checks](#37175-consistency-degeneracy-and-continuity-checks)
-      - [3.7.1.8. Calibrating the Simulator](#3718-calibrating-the-simulator)
-      - [3.7.1.9. Experiment Design](#3719-experiment-design)
-      - [3.7.1.10. Running Simulations](#37110-running-simulations)
-      - [3.7.1.11. Data Collection and Analysis](#37111-data-collection-and-analysis)
+  - [3.7. Collecting Statistics in the Simulator](#37-collecting-statistics-in-the-simulator)
+  - [3.8. Averaging Quantities](#38-averaging-quantities)
+    - [3.8.1. Rate](#381-rate)
+    - [3.8.2. Time-Independent Sample Mean](#382-time-independent-sample-mean)
+    - [3.8.3. Time-Dependent Sample Mean](#383-time-dependent-sample-mean)
+  - [3.9. Estimations](#39-estimations)
+    - [3.9.1. Bin Distribution](#391-bin-distribution)
+    - [3.9.2. Distribution](#392-distribution)
+  - [3.10. Simulation Analysis](#310-simulation-analysis)
+    - [3.10.1. Case Study: VoIP in 5G Network](#3101-case-study-voip-in-5g-network)
+      - [3.10.1.1. Defining the Objectives and Performance Indicators](#31011-defining-the-objectives-and-performance-indicators)
+      - [3.10.1.2. Modeling the System](#31012-modeling-the-system)
+      - [3.10.1.3. Validating the Model](#31013-validating-the-model)
+      - [3.10.1.4. Defining the Factors](#31014-defining-the-factors)
+      - [3.10.1.5. Select the Simulation Tool](#31015-select-the-simulation-tool)
+      - [3.10.1.6. Implementation](#31016-implementation)
+      - [3.10.1.7. Verification](#31017-verification)
+        - [3.10.1.7.1. Fingerprinting](#310171-fingerprinting)
+        - [3.10.1.7.2. Rubber-Duck Debugging](#310172-rubber-duck-debugging)
+        - [3.10.1.7.3. Statistical Verification](#310173-statistical-verification)
+        - [3.10.1.7.4. Usage of Animations and Graphs](#310174-usage-of-animations-and-graphs)
+        - [3.10.1.7.5. Consistency, Degeneracy and Continuity Checks](#310175-consistency-degeneracy-and-continuity-checks)
+      - [3.10.1.8. Calibrating the Simulator](#31018-calibrating-the-simulator)
+      - [3.10.1.9. Experiment Design](#31019-experiment-design)
+      - [3.10.1.10. Running Simulations](#310110-running-simulations)
+      - [3.10.1.11. Data Collection and Analysis](#310111-data-collection-and-analysis)
       <!--toc:end-->
 
 # 2. Systems
@@ -592,7 +600,208 @@ In this case, the approach is the following:
 As we said, this is a last-resort approach, since it is difficult to validate
 and it is not flexible nor scalable.
 
-## 3.7. Simulation Analysis
+## 3.7. Collecting Statistics in the Simulator
+
+We said that a simulator processes events in order to compute some output
+numbers.
+
+The part devoted to computing the measures of interest is called **statistics
+collection**.
+
+Assuming that we want the average delay of a flow of packets as a result.
+The mathematical definition would be:
+
+$$
+D = \frac{1}{M} \cdot \sum_{i=1}^{M} d_i \qquad
+d_i = \text{departure time}_i - \text{arrival time}_i
+$$
+
+In order to compute $D$ in our simulator, we can either:
+
+1. Log all the events in the simulation (related to packet arrival/departure etc.)
+   on a log file. After the simulation terminates, take the trace file and parse
+   it, thus computing the sample mean of the delay
+2. Store all the information we need in internal data structures (those that we
+   called _statistics gathering_), and compute the final result only.
+   In this case, it is enough to use both a _counter_ which stores the sum and a
+   _counter which is increased at every packet departure_.
+
+These are the two extremes, but anything in between is possible.
+
+For example, we might want to use a log file, and log the delay of each
+packet instead of logging its arrival/departures etc..
+
+Another approach might makes us store the event trace in memory, and then
+dump it all on the disk only at the end of the simulation.
+
+The first approach need a **longer execution times**, since disk writes cost a lot.
+
+On the other hand, we are able to get **much more information** from a
+complete log file. For instance, we might want to know the sample variance of
+the delay. Having a log file makes us able to do that immediately without
+modifying the simulation nor running the same simulation again.
+
+In general the tracefile gives us a lot of information useful especially
+during the _debugging phase_.
+
+The second approach uses allows for shorter execution times (often
+considerably so) at the price of _less flexibility_ of the simulator.
+
+The optimal choice depends, thus, on your objectives.
+
+Event logging is **normally most useful during the debug phase**, and _should be
+disabled afterwards_ (unless you have good cause to do otherwise).
+
+## 3.8. Averaging Quantities
+
+There are **several types of averages** we can compute, depending on how
+we need to analyze the sampled data during the simulation.
+
+### 3.8.1. Rate
+
+It's a **time dependent average** of a quantity $x$ over a time interval $\tau$.
+
+Given $N$ samples $\Set{x_1, x_2, ..., x_N}$, we can compute the **rate** as:
+
+$$
+  y = \frac{1}{\tau} \cdot \sum_{i=1}^{N} x_i \qquad
+\tau := \text{time interval over which the samples are collected}
+$$
+
+This is useful for example when we want to compute the **throughput** of a network
+link $y$ from the sizes of the packets $x_i$ that have been transmitted in a
+time interval $\tau$.
+
+To calculate this in a simulation we need to store the **sum of the samples**, and
+**the time interval** (from the _start time_ and _end time_).
+
+### 3.8.2. Time-Independent Sample Mean
+
+It's a **time independent average** of a quantity $x$ over a number of samples $N$.
+
+Given $N$ samples/impulses $\Set{x_1, x_2, ..., x_N}$, we can compute the **sample
+mean** as:
+
+$$
+  y = \frac{1}{N} \cdot \sum_{i=1}^{N} x_i
+$$
+
+This is useful for example when we want to compute the **average delay** of a
+flow of packets $y$ from the delays $x_i$ of the packets over all the transmitted
+packets $N$.
+
+To calculate this in a simulation we just need to store the **sum of the samples**
+and **their number**.
+
+### 3.8.3. Time-Dependent Sample Mean
+
+It's a **time dependent average** of a quantity $x$ over a number of samples $N$.
+
+Given $n$ time-dependent samples/_levels_ $\Set{(x_1, t_1), (x_2, t_2), ...,
+(x_n, t_n)}$, we can compute the **time-dependent sample mean** as:
+
+$$
+  y = \frac{\sum_{i=1}^N x_i \cdot (t_{i+1} - t_i)}{\sum_{i=1}^N (t_{i+1} - t_i)}
+= \frac{1}{t_n - t_1} \cdot \sum_{i=1}^{n} x_i \cdot (t_i - t_{i-1})
+$$
+
+These is similar to a **weighted mean**, where the weights are the time
+intervals between
+two consecutive samples.
+
+This can be useful for example when we want to compute the **average queue length**
+of a network link $y$ from the queue lengths $x_i$ at time $t_i$ over the whole
+simulation time $t_n - t_1$.
+
+To calculate this in a simulation we need to store **each and every sample** along
+with its **duration**.
+
+## 3.9. Estimations
+
+When simulating a system we are not only interested in computing the average often
+a quantity, but also in calculating **probabilities** and **percentiles**.
+
+In these cases we first need to **estimate the _distribution_** of the
+quantity we are measuring, and then compute its average value.
+
+To do so can be very complex, but we are able to tolerate a few approximations
+that make the process easier.
+
+### 3.9.1. Bin Distribution
+
+To estimate the distribution of a quantity we can use **histograms**.
+
+To do that we use a three step approach:
+
+1. Decide the **range of interest** $[x_{min}, x_{max}]$ of our metric
+2. Decide the **granularity** $\delta$ we can accept
+3. We divide the range into $k = \frac{x_{max} - x_{min}}{\delta}$ buckets of
+   width $\delta$ and count how many samples fall into each bucket.
+
+Whenever a sample is collected during the simulation, we **add 1 to the corresponding
+bucket**, keeping tracks of possible overflows (samples that are smaller than
+$x_{min}$ or larger than $x_{max}$).
+
+At the end, we can derive an estimate of the CDF from the results of the
+histogram, and then compute the average, percentiles, etc.
+
+This approach has the advantage of being **memory efficient**, since we only
+need to store the counts of the buckets, and not all the samples, but at the
+price of **needing to choose two different variables**: the range of interest
+and the granularity.
+
+Changing even only one of these two variables will require not only to **run the
+simulation again**, but could also change the results of the simulation, since the
+histogram will be different.
+
+### 3.9.2. Distribution
+
+If we just need the **CDF** or **quantiles** of our metric, we don't need to define
+ranges and buckets.
+
+We are able to derive them just from the actual samples we collected during
+the simulation, storing them simply in a array.
+
+Supposing the simulation produces $N = 8$ samples, what we can do is the following:
+
+$$
+\begin{CD}
+\begin{matrix}
+5 \\
+18 \\
+35 \\
+67 \\
+28 \\
+43 \\
+51 \\
+24 \\
+\end{matrix}
+@> \text{Sort} >>
+\begin{matrix}
+5 \\
+18 \\
+24 \\
+28 \\
+35 \\
+43 \\
+51 \\
+67 \\
+\end{matrix}
+@> \text{Compute CDF} >>
+\begin{matrix}
+F(5) = \frac{1}{8} \\
+F(18) = \frac{2}{8} \\
+F(24) = \frac{3}{8} \\
+F(28) = \frac{4}{8} \\
+F(35) = \frac{5}{8} \\
+F(43) = \frac{6}{8} \\
+F(51) = \frac{7}{8} \\
+F(67) = \frac{8}{8} \\
+\end{matrix}
+\end{CD}
+$$
+
+## 3.10. Simulation Analysis
 
 Simulation, as any other engineering practice, has a **workflow**, a set of
 action to be taken.
@@ -619,7 +828,7 @@ The workflow addresses the following steps:
 1. Design the **experiments** to be run,
 1. **Run** the experiment and **analyze** the results
 
-### 3.7.1. Case Study: VoIP in 5G Network
+### 3.10.1. Case Study: VoIP in 5G Network
 
 User Equipments (UEs) establish a **Voice-over-IP (VoIP)** communication with
 their respective remote endpoint.
@@ -649,7 +858,7 @@ stations.
 > will not go into the details of how 5G networks work, since it is not the
 > focus of this course.
 
-#### 3.7.1.1. Defining the Objectives and Performance Indicators
+#### 3.10.1.1. Defining the Objectives and Performance Indicators
 
 The first step is to **define the objectives** of the simulation.
 
@@ -675,7 +884,7 @@ understanding which techniques is _better_ than the others, hence:
 
 > Which techniques achieves a higher end-to-end throughput and/or a lower latency.
 
-#### 3.7.1.2. Modeling the System
+#### 3.10.1.2. Modeling the System
 
 Building a model of the system is one of the most important steps in the simulation
 workflow, as well as one of the **most difficult**.
@@ -719,7 +928,7 @@ model too complex to be simulated.
 There is also the subtlety of **upgradability** of the model, meaning the
 possibility to **easily add/remove features/parameters** to the model.
 
-#### 3.7.1.3. Validating the Model
+#### 3.10.1.3. Validating the Model
 
 **Models _need to be validated_** to ensure that they correctly represent the
 system for which the stand in.
@@ -751,7 +960,7 @@ against the system.
 <img class="" src="./images/simulation/validation-workflow.png"
       alt="Validation Workflow">
 
-#### 3.7.1.4. Defining the Factors
+#### 3.10.1.4. Defining the Factors
 
 A **factor** is a variable that can influence our system.
 
@@ -779,7 +988,7 @@ In the case of our 5G network, some of the factors we can define are:
 > Factors can make us **change the model** we are using.
 > However, changing the model **can changes the unfixed factors**.
 
-#### 3.7.1.5. Select the Simulation Tool
+#### 3.10.1.5. Select the Simulation Tool
 
 Once we have a clear idea of what we are going to do, we need to select the
 **most suitable simulation tool** for our case study.
@@ -810,7 +1019,7 @@ There are several alternatives from which we can choose:
 For the purpose of this course the choice is "forced" to use the `OmNeT++` framework,
 which is a **general-purpose discrete event simulator**.
 
-#### 3.7.1.6. Implementation
+#### 3.10.1.6. Implementation
 
 Coding must be state-of-the-art, meaning that we must use the best practices of
 software engineering.
@@ -826,7 +1035,7 @@ and programming:
   (`assert` statements, `if` statements, ...) that **raise exceptions** when the
   condition is not met.
 
-#### 3.7.1.7. Verification
+#### 3.10.1.7. Verification
 
 When we produced a code that doesn't crash we **are still far from being done**.
 
@@ -852,7 +1061,7 @@ After the simulation passes these kind of verification, we can start complicatin
 the scenario by adding more factors, and check that the simulation still
 produces the expected outputs.
 
-##### 3.7.1.7.1. Fingerprinting
+##### 3.10.1.7.1. Fingerprinting
 
 It is also possible to use several more advanced techniques to verify the correctness
 of the simulation, like **fingerprinting**.
@@ -864,7 +1073,7 @@ good output.
 This is done by extracting an _hash_ (_fingerprint_) out of a known good
 result, and use it as a **reference** to compere the future outputs of the simulation.
 
-##### 3.7.1.7.2. Rubber-Duck Debugging
+##### 3.10.1.7.2. Rubber-Duck Debugging
 
 **Rubber-Duck Debugging** is a structured walk-through technique that helps
 the programmer understand the behavior of the code and find bugs.
@@ -878,7 +1087,7 @@ trace outputs) we can _trace_ what our code actually did.
 Of course this can also benefit from using a **_debugger_** to step through the
 code and inspect the state of the simulation at each step.
 
-##### 3.7.1.7.3. Statistical Verification
+##### 3.10.1.7.3. Statistical Verification
 
 When we are simulating a system that has **stochastic behavior**, we need to
 be careful when verifying the correctness of the simulation.
@@ -895,7 +1104,7 @@ There is not a standard way to verify the correctness of a simulation with
 stochastic behavior, but we can use _common-sense_ and _try-and-error_ to check
 that the results are reasonable and follow the theoretical expectations.
 
-##### 3.7.1.7.4. Usage of Animations and Graphs
+##### 3.10.1.7.4. Usage of Animations and Graphs
 
 Some simulation frameworks, for example `OmNeT++`, provide **animations** and
 **graphs** to visualize what is actually happening in the simulation.
@@ -903,7 +1112,7 @@ Some simulation frameworks, for example `OmNeT++`, provide **animations** and
 This makes easier for us to _spot odd behavior_, increasing the chances to find
 bugs in the code.
 
-##### 3.7.1.7.5. Consistency, Degeneracy and Continuity Checks
+##### 3.10.1.7.5. Consistency, Degeneracy and Continuity Checks
 
 **Consistency Checks** are checks that verify that the simulation is
 consistent in similar scenarios. For example, the system should behave the
@@ -919,7 +1128,7 @@ continuously when we change the parameters of the system. For example, if we
 increase the number of users from 1 to 2, the performance should not change
 drastically, like if we increased the user by 1000x.
 
-#### 3.7.1.8. Calibrating the Simulator
+#### 3.10.1.8. Calibrating the Simulator
 
 In a simulator there are several **configuration variables** that needs to be given
 a value.
@@ -945,7 +1154,7 @@ Between all the parameters, two have to be considered very carefully:
 - Simulation Duration
 - Warm-up time
 
-#### 3.7.1.9. Experiment Design
+#### 3.10.1.9. Experiment Design
 
 As we said before, factors can change the model we are using. Thus, we have to
 verify that the model is able to support at least the **range of values of interest
@@ -967,7 +1176,7 @@ There are known techniques that can help reducing the number of factors, like $2
 analysis, which tells us at a reasonable price which factors have the highest impact
 on performance.
 
-#### 3.7.1.10. Running Simulations
+#### 3.10.1.10. Running Simulations
 
 Running simulations **take time**. For this reason it's important to
 know beforehand which scenario we want to test and if parameters are set
@@ -1002,7 +1211,7 @@ Instead, we will focus on **Multiple Replications in Parallel**, which is a simp
 approach in which each simulation is done independently on different _CPU cores_,
 allowing us to obtain more results in the same time.
 
-#### 3.7.1.11. Data Collection and Analysis
+#### 3.10.1.11. Data Collection and Analysis
 
 When we deal with large simulations, we produce **large amounts of data**
 (it is not uncommon to produce in the order of hundreds of MB) that needs to

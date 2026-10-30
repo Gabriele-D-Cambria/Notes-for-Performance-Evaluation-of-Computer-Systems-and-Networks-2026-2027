@@ -52,7 +52,7 @@ given a final grade which is the average of all the single grades.
 
 The main goals of this course are:
 
-- Probability Theory, Statistics and Experimental Designs (Stea)
+- Probability Theory, Statistics and Experimental Designs
 
 - Model: Software Simulations
 
@@ -77,8 +77,8 @@ Requirements for the course are:
 
 ### Simulations (Nardini)
 
-1. [Systems and Simulations](./Systems%20and%20Simulations)
-1. [Random Number Generators](./Random%20Number%20Generators)
+1. [Systems and Simulations](./simulations/Systems%20and%20Simulations)
+1. [Random Number Generators](./simulations/Random%20Number%20Generators)
 
 ## 📜 Disclaimer
 
