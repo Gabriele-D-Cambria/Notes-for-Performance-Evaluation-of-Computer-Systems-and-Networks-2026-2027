@@ -25,7 +25,20 @@ title: Statistics
     - [2.5.1. Range](#251-range)
     - [2.5.2. Sample Variance](#252-sample-variance)
     - [2.5.3. Sample Standard Deviation and Sample Coefficient of Variation](#253-sample-standard-deviation-and-sample-coefficient-of-variation)
-    <!--toc:end-->
+    - [2.5.4. Sample Percentiles](#254-sample-percentiles)
+    - [2.5.5. Semi-Interquartile Range and Lorenz Curve Gap](#255-semi-interquartile-range-and-lorenz-curve-gap)
+    - [2.5.6. Using the correct index](#256-using-the-correct-index)
+  - [2.6. Fitting a Distribution](#26-fitting-a-distribution)
+    - [2.6.1. QQ Plots](#261-qq-plots)
+    - [2.6.2. Example: Normally Distributed Sample](#262-example-normally-distributed-sample)
+    - [2.6.3. Algebraic Tests](#263-algebraic-tests)
+  - [2.7. Confidence Intervals](#27-confidence-intervals)
+    - [2.7.1. Computing Confidence Intervals](#271-computing-confidence-intervals)
+      - [2.7.1.1. Population Mean](#2711-population-mean)
+        - [2.7.1.1.1. Exercise: Signal and Noise](#27111-exercise-signal-and-noise)
+      - [2.7.1.2. Paired Experiments](#2712-paired-experiments)
+        - [2.7.1.2.1. Example: Paired Experiments](#27121-example-paired-experiments)
+        <!--toc:end-->
 
 # 2. Statistics
 
@@ -314,7 +327,7 @@ Common practices for the _whiskers_ are:
   the highest datum still within $1.5 \cdot (Q_3 - Q_1)$ of the upper quartile.
   Where $Q_3 - Q_1$ is called the **interquartile range** (IQR).
 
-<img class="" src="./images/statistics/box-plot.png"
+<img class="30" src="./images/statistics/box-plot.png"
       alt="Box Plot">
 
 ## 2.3. Lorenz Curves
@@ -377,7 +390,7 @@ After plotting the curve, we can make some assumptions based on its shape:
 
 </div>
 <div class="">
-<img class="80" src="./images/statistics/lorenz-curve.png"
+<img class="60" src="./images/statistics/lorenz-curve.png"
       alt="Lorenz Curve">
 </div>
 </div>
@@ -457,7 +470,7 @@ be unique**.
 
 The question that now rises is which of the three indexes is the best to use.
 
-<img class="" src="./images/statistics/mean-median-mode.png"
+<img class="30" src="./images/statistics/mean-median-mode.png"
       alt="Mean, Median and Mode">
 
 In general, like everything, it **depends on the distribution of the sample**.
@@ -494,6 +507,7 @@ mean **can change significantly**.
 On the other hand the new median becomes:
 
 $$
+\large
 X'_{0.5} = \begin{cases}
   \frac{X_{(\lceil n/2 \rceil)} + X_{(\lceil n/2 \rceil + 1)}}{2} = X_{0.5} +
 \frac{X_{(\lceil n/2 \rceil + 1)} - X_{(\lceil n/2 \rceil)}}{2}
@@ -576,8 +590,10 @@ take ratios of measures.
 For these, the CoV is bounded by $0 \le C \le \sqrt{n-1}$.
 
 These are cases of distribution in which **variance is infinite**, meaning for
-**heavy-tailed distributions**. <small>(Note that all infinite variance
-RVs are HT, but not all HT RVs have infinite variance)</small>
+**heavy-tailed distributions**.
+
+> [!NOTE]
+> All infinite variance RVs are HT, but not all HT RVs have infinite variance
 
 We can observe these RVs more frequently that we might expect, and for those
 there is a risk that the CoV will increase indefinitely with $n$, making
@@ -601,3 +617,670 @@ We can easily check that the IoD is:
 
 Note that both CoV and IoD tend to be **unstable** if the sample mean is
 _close to zero_.
+
+### 2.5.4. Sample Percentiles
+
+**Sample Percentiles** (or **quantiles**) can be computed from the _ordered statistics_.
+
+Strangely enough, there is **no standard way** to compute percentiles, but rather
+three or four different ways that whose results **agree when the sample is large**.
+
+However, on small samples, we can observe significant differences.
+
+For the following examples, we will consider a sample of 5 $X_{(1)}, X_{(2)},
+X_{(3)}, X_{(4)}, X_{(5)}$.
+
+We can readily state that the 20-th percentile is $X_{(1)}$, but it is hard to
+understand what the 35-th percentile would be.
+
+To solve this problem, as we said before, there are several methods:
+
+- **Next Higher**: on a sample of $n$, looking for the $p$-quantile we take
+  $X_{\left(\lceil n \cdot p \rceil\right)}$.
+- **Linear Interpolation**: on a sample of $n$, looking for the $p$-quantile we
+  make some linear interpolation between the two adjacent values, and then
+  we calculate on the point we want. In this case, for the 35-th percentile
+  we would interpolate between $X_{(1)}$ and $X_{(2)}$.
+
+The problems with this approach is that if we consider $X_{(1)}$ as the 20-th
+percentiles means that $X_{(5)}$ will be the 100-th percentile, aka the
+biggest value of our distribution, which is a bold claim.
+
+On the other end, considering $X_{(5)}$ as the 80-th percentile means that
+$X_{(1)}$ will be the 0-th percentile, aka the smallest value of our distribution,
+which is also a bold claim.
+
+The correct procedure is then to consider the range of the ordered statistics
+and **divide it in** $n$ **consecutive buckets** of equal width.
+
+Each ordered statistic will represent the **mid-point** of each bucket.
+
+<div class="flexbox" markdown="1">
+
+| Ordered Statistic |  Bucket  | Midpoint |
+| :---------------: | :------: | :------: |
+|     $X_{(1)}$     |  0 - 20  |    10    |
+|     $X_{(2)}$     | 20 - 40  |    30    |
+|     $X_{(3)}$     | 40 - 60  |    50    |
+|     $X_{(4)}$     | 60 - 80  |    70    |
+|     $X_{(5)}$     | 80 - 100 |    90    |
+
+</div>
+
+In other words, having a sample of $n = 5$ means having the 10-th, 30-th, 50-th,
+70-th and 90-th percentiles.
+
+This is equivalent of using the following formula:
+
+$$
+  X_{(j)} \to \frac{j - 0.5}{n}
+$$
+
+### 2.5.5. Semi-Interquartile Range and Lorenz Curve Gap
+
+The **semi-interquartile range** is defined as half the box height in a box plot:
+
+$$
+  \text{semi-IQR} = \frac{Q_3 - Q_1}{2}
+$$
+
+Le **Lorenz Curve Gap** is defined as the _maximum vertical distance_ between the
+bisector and the LC:
+
+$$
+LCG = \max_{0 \le j \le n} \left(\frac{j}{n} -
+\sum_{i=1}^{j} \frac{X_{(i)}}{n} \cdot \overline{X}
+\right) = \frac{1}{2\overline{X}} \cdot
+\frac{\sum_{i=1}{n} \vert X_i - \overline{X} \vert}{n}
+$$
+
+Where the second term $\left(\frac{1}{n} \cdot \sum_{i=1}{n} \vert X_i -
+\overline{X} \vert\right)$, is called **Mean Absolute Deviation (MAD)**, and
+is a measure of the _average distance_.
+
+The LCG, like the CoV, normalizes a measure of variability to an _index of
+central tendency_, making it **dimensionless** and allowing for **comparison**
+between different samples.
+
+### 2.5.6. Using the correct index
+
+With indexes of dispersion, its important to know when to use one or the other.
+
+Summarizing our alternatives, we can say that:
+
+- **Robustness to outliers**: range is the most vulnerable. Variance and STD may
+  also be affected by them, while IQR is almost insensitive.
+- **Bounded Variables**: range may be the best choice.
+- **Symmetric and Unimodal Variables**: variance (or STD, CoV) may be a good choice,
+  unless the distribution has **heavy-tails**, in which case the LCG is preferable.
+- **Highly Skewed and Likely outliers**: percentiles and IQR are the best choice.
+
+## 2.6. Fitting a Distribution
+
+A good way to summarize a sample is to state from **what distribution it is
+(likely to be) sampled**.
+
+For instance, sayng that our sample ha a mean of $13$ and variance $48$ says
+**considerably less** that saying it is $\sim U(1, 25)$.
+
+The problem is how to choose the theoretical distribution our sample should fit.
+
+Quite often, the choice is **not entirely wild**, since we can have a rough
+idea of the underlying phenomena that generated the sample.
+
+If, instead, we have **absolutely no idea**, we can always start by using
+simple tricks:
+
+- **Compute statistics**: meaning computing **sample mean, median, variance
+  and CoV**. For instance, if $\overline{X} \approx X_{0.5}$ then there is a
+  good chance we are dealing with a symmetric distribution. Instead, if they are
+  significantly different, we will know that our distribution is skewed.
+  **CoV**/**IoD** can also be useful. For instance, in an _exponential distribution_
+  the CoV is $1$.
+- **Draw histograms**: it will allow us to **estimate PDF** or **PMF**. Some
+  of them have a easily recognizable shape (the exponential, the Normal, the
+  uniform, etc.), while others are more difficult to identify.
+
+What we must avoid doing is to **compare the ECDF with the one of a theoretical
+distribution**, since most **CDFs have an S shape**.
+
+Once we have selected one or few candidates, the easiest way to test whether our
+distribution fits the theoretical one is to make a **visual test using QQ-plots**.
+
+### 2.6.1. QQ Plots
+
+QQ-plots are a way to compare **quantiles** of two distributions:
+
+- **X-axis**: quantiles of the "theoretical" distribution $t_{(1-i)}$
+- **Y-axis**: quantiles of the "sample" distribution $q_{(1-i)}$
+
+Thus every point is $\left(t_{(1-i)}, q_{(1-i)}\right)$, where $i$ is the _quantile
+level_.
+
+The visual test is the following: If the QQ-plot is **approximately a straight
+line**, then the two distributions are _similar_, meaning out theoretical distribution
+is **consistent with our sample data**.
+
+We already know how to evaluate the ordinates of the points, since we have
+already seen how to easily compute **sample quantiles**:
+
+$$
+  X_{(j)} \to \frac{j - 0.5}{n}
+$$
+
+If the theoretical distribution has an **invertible CDF**, then its quantiles can
+be computed quite easily too.
+
+In fact, since $p = F(x)$, then $t_{(1-i)} = F^{-1}(i)$.
+
+For example, the $i$-quantile of an $Exp(\lambda)$ is obtained by solving:
+
+$$
+i = 1 - e^{-\lambda \cdot t_{(1-i)}} \quad \rArr \quad
+t_{(1-i)} = -\frac{\log{(1-i)}}{\lambda}
+$$
+
+Instead, if the CDF is **not known in a closed form** (e.g., the Normal one), then
+we can still obtain its quantiles from **tables**.
+
+For the **Standard Normal Distribution**, a good approximation often used in
+practice is the following:
+
+$$
+t_{1-i} \approx 4.91 \cdot \left(i^{0.14} - (1-i)^{0.14}\right)
+$$
+
+Of course, if we are dealing with a _non-standard Normal_ $F \sim \mathcal{N}(\mu,
+\sigma)$, we can use the _standardization_ trick:
+
+$$
+t_{1-i}' = \mu + \sigma \cdot t_{i}
+$$
+
+Interestingly enough, QQ plots often don't even need to know the **parameters of
+the theoretical distribution**. This is true every time the effect of the parameter
+is just to **rescale or offset the quantiles**.
+
+In this case, assuming a _default value_ will still give us a straight like,
+just with a different slope and/or offset.
+
+This is not important for us, since the only thing we look for is **the linear pattern**.
+
+### 2.6.2. Example: Normally Distributed Sample
+
+> Consider the following sample of $8$, and check if it is normally distributed
+
+ <div class="flexbox" markdown="1">
+
+|  j  | Quantile number | ord. Stat | normal q |
+| :-: | :-------------: | :-------: | :------: |
+|  1  |     0.0625      |   -0.19   |  -1.535  |
+|  2  |     0.1875      |   -0.14   |  -0.885  |
+|  3  |     0.3125      |   -0.09   |  -0.487  |
+|  4  |     0.4375      |   -0.04   |  -0.157  |
+|  5  |     0.5625      |   0.04    |  0.157   |
+|  6  |     0.6875      |   0.09    |  0.487   |
+|  7  |     0.8125      |   0.14    |  0.885   |
+|  8  |     0.9375      |   0.19    |  1.535   |
+
+ </div>
+
+The first thing is to compute the ordered statistic and assign them quantiles
+$\frac{j - 0.5}{n}$.
+
+Then we use the formula seen before to compute the quantiles of the standard
+Normal.
+
+Finally, we plot the points $\left(t_{(1-i)}, q_{(1-i)}\right)$ and check if they
+show good linearity.
+
+The regression analysis (done automatically by Excel) computes the means to be (almost)
+null, and the standard deviation to be around $0.1369$.
+
+<figure class="40">
+<img class="80" src="./images/statistics/qq-plot-normal.png"
+      alt="QQ Plot Normal">
+<figcaption>
+
+Excel also gives a value $0 \le R^2 \le 1$ which indicates how well the points fit
+a straight line.  
+In this case, $R^2 = 0.9747$.
+
+</figcaption>
+</figure>
+
+If we had not taken the middle point of the buckets as our quantiles, but
+instead the _upper end of he bucket_ (i.e, $j/n$), the quantiles would be:
+
+ <div class="flexbox" markdown="1">
+
+|  j  | Quantile number | ord. Stat | normal q |
+| :-: | :-------------: | :-------: | :------: |
+|  1  |      0.125      |   -0.19   |  -1.535  |
+|  2  |      0.25       |   -0.14   |  -0.885  |
+|  3  |      0.375      |   -0.09   |  -0.487  |
+|  4  |       0.5       |   -0.04   |  -0.157  |
+|  5  |      0.625      |   0.04    |  0.157   |
+|  6  |      0.75       |   0.09    |  0.487   |
+|  7  |      0.875      |   0.14    |  0.885   |
+|  8  |        1        |   0.19    |  1.535   |
+
+ </div>
+
+With the plot that becomes like this:
+
+<img class="30" src="./images/statistics/qq-plot-normal-wrong.png"
+      alt="QQ Plot Normal Wrong">
+
+We could also encounter different outcomes.
+
+For example, when comparing to a Normal distribution, we could get a **S shape**,
+which is a typical case with **_shorter tails_**.
+
+This might happen often, since in many cases the variables are bounded, while
+the Normal has infinite tails.
+
+If this happens, a good next step is to test for a **Uniform Distribution**.
+
+<img class="30" src="./images/statistics/qq-plot-S-shape.png"
+      alt="QQ Plot S shape">
+
+Instead, if the tails of the Normal QQ plot go **up and down** there is a
+chance that a distribution with **heavier tails** may yield a better fit
+(e.g., log-normal or Pareto).
+
+As a counter-proof we could check the original sample of 8 to check if it matches
+a **Uniform Distribution**.
+
+We might as well assume $U(0,1)$ since we already ascertained this changes nothing.
+
+The QQ plot is as follows:
+
+<img class="30" src="./images/statistics/qq-plot-uniform.png"
+      alt="QQ Plot Uniform">
+
+Now we notice that our sample shows **almost perfect linearity**.
+
+This means that our sample could equally well have been taken from:
+
+- $\mathcal{N}(0, 0.13)$
+- $U(-0.203, +0.203)$
+
+The main goal becomes to discriminate between the two samples.
+
+In this case the solution is simple: **get a larger sample**, since eight points
+will fit to almost everything.
+
+### 2.6.3. Algebraic Tests
+
+To assert whether or not data from a sample match a given distribution there
+are also _tests relying on algebra_.
+
+The most well-known are:
+
+- **Chi-Square Test**
+- **Kolmogorov-Smirnov Test**
+
+They are **not easy to use** and they require _a lot of hypotheses_ and _practice_
+to be able to interpret the results.
+
+Moreover, these require the **matching theoretical distribution to be _entirely
+specified_**, meaning that we need to know the parameters of the distribution
+we want to test against.
+
+## 2.7. Confidence Intervals
+
+As part of the **scientific method** we are duty-bound to **_show the accuracy of
+a measurement_** whenever we produce one.
+
+We can **lie blatantly** by _omitting to state the accuracy_ of a measurement.
+
+Especially when we are dealing with **random variables and samples**, we never
+know how much of the result we are claiming is due to **luck** (i.e., a
+_particularly lucky sample_).
+
+Assume for example that we get two samples of the same measure from
+two systems $A$ and $B$, and we compute the mean for both, let it be $\overline{X}_A$
+and $\overline{X}_B$.
+
+Suppose, we find $\overline{X}_A > \overline{X}_B$, since the sample means
+estimate the _population mean_, we can conclude that **system A performs
+better than B**.
+
+However, if we manipulate our data, we can obtain that the interval where we are
+extracting our samples are very different, for example by inserting a 95% confidence
+interval just for one of the two systems, using data too variable or sample
+too small).
+
+By doing so, the **accuracy** of our statistic and our conclusion simply **do not
+hold anymore**.
+
+Instead, if the two samples are taken from both 95% confidence intervals, we
+can be **95% sure** that the _true population mean_ follows our claim.
+
+> [!IMPORTANT]
+> Every statistic taken from a sample is itself a **random variable**.  
+> Therefore, its accuracy must be **_always_** _quantified_ and reported in the
+> form of a **confidence interval**.
+
+### 2.7.1. Computing Confidence Intervals
+
+We define $[l, h]$ a **confidence interval** for parameter $\beta$ at level
+$(1-\alpha)$ if:
+
+$$
+P\Set{l \le \beta \le h} \ge (1-\alpha)
+$$
+
+A **confidence interval** at level $(1-\alpha)$ is an interval where we have
+_a probability of at least_ $(1-\alpha)$ to find the parameter we are estimating
+using our sample statistics.
+
+The value $(1-\alpha)$ is called the **confidence level** of the interval, and
+it is typically values such as $90\%, 95\%, 98\%, 99\%$.
+
+Confidence intervals are computed differently from a sample of IID RVs, depending
+on what parameter we want to estimate.
+
+We will see two different methods, one for the **population mean** and one for the
+**probability of success** of a Bernoulli experiment.
+
+> [!warning]
+> The methods we will see will only hold **under the assumption that the sample
+> consists of IID RVs**, otherwise we will obtain _false conclusions_.
+
+#### 2.7.1.1. Population Mean
+
+Assuming we are dealing with a population with **finite mean and variance**, we
+have defined the _sample mean_ to be:
+
+$$
+\overline{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+And found that $E[\overline{X}] = \mu$ and $\operatorname*{Var}(\overline{X})
+= \frac{\sigma^2}{n}$.
+
+We also stated that $\overline{X} \sim \mathcal{N}\left(\mu,
+\frac{\sigma^2}{n}\right)$ for either _large_ $n \ge 30$, or if each $X_i$ is Normal.
+
+A ineficcient way to compute a 90%-CI for the sample mean is to:
+
+1. Take $k$ independent samples of $n$ observation each
+1. Compute the sample means of each of the $k$ samples, $\overline{X}_1,
+\overline{X}_2, \ldots, \overline{X}_k$
+1. Compute the 5-th and 95-th percentiles of the $k$ sample means
+
+A more efficient use of the amount of information that is inherent in a sample
+of $n$ IID RVs can be done by leveraging the **sample variance** we defined as:
+
+$$
+S^2 = \frac{1}{n-1} \cdot \sum_{i=1}^n{\left(X_i - \overline{X}\right)^2}
+$$
+
+We found that $E[S^2] = \sigma^2$, and that, **only if the sample is large**
+$(n \ge 30$)$ then:
+
+$$
+\frac{\overline{X} - \mu}{S / \sqrt{n}} \sim \mathcal{N}(0, 1)
+$$
+
+Even if we don't know $\sigma$ we can estimate it using $S^2$, hoping that if $n$
+is large:
+
+$$
+Z = \frac{\overline{X} - \mu}{S / \sqrt{n}} \sim \mathcal{N}(0, 1)
+$$
+
+In this case, the (symmetric) interval that defines an area equal to
+$(1-\alpha)$ in the Standard Normal is the one colored in the figure.
+
+The point that leaves out a right tail with an area equal to $0.025$, i.e. the
+one such that $P\Set{Z > z_{0.025}} = 0.025$ is the 97.5-th percentile of the
+Standard Normal, and is equal to $z_{0.025} = 1.96$.
+
+<img class="30" src="./images/statistics/ci-mean.png"
+      alt="Confidence Interval for the Mean">
+
+Therefore, the interval $[-z_{0.025}, z_{0.025}]$ includes $Z$ with 95% probability.
+
+More in general, we take the $(1-\alpha / 2)$ percentile, and we can write:
+
+$$
+\begin{align*}
+  P\Set{-z_{\alpha / 2} \le \frac{\overline{X} - \mu}{S/ \sqrt{n}} \le
+z_{\alpha / 2}} &= 1 - \alpha \\
+  P\Set{\overline{X} - z_{\alpha / 2} \cdot \frac{S}{\sqrt{n}} \le \mu \le
+\overline{X} + z_{\alpha / 2} \cdot \frac{S}{\sqrt{n}}} &= 1 - \alpha
+\end{align*}
+$$
+
+Therefore, the $(1-\alpha)$ level confidence interval for the population mean
+$\mu$ is:
+
+$$
+\left[\overline{X} - z_{\alpha / 2} \cdot \frac{S}{\sqrt{n}}, \overline{X} +
+  z_{\alpha / 2} \cdot \frac{S}{\sqrt{n}}\right]
+$$
+
+This will hold only if the population has a _finite variance_ and the _sample
+is large_.
+
+If the sample is small, we can apply this method **only if the population consists
+of Normal RVs**.
+
+In this case, we take for granted that for Normal RVs:
+
+$$
+(n-1) \cdot \frac{S^2}{\sigma^2} \sim \chi^2_{n-1}
+$$
+
+Meaning that the sample variance is distributed like a chi-square with $n-1$
+degrees of freedom.
+
+Moreover, since $\overline{X}$ and $S^2$ are independent, we have that:
+
+$$
+T = \frac{\overline{X} - \mu}{S / \sqrt{n}} \sim t_{n-1}
+$$
+
+Therefore, we can immediately obtain that:
+
+$$
+\begin{CD}
+{
+P\Set{\overline{X} - \frac{S}{\sqrt{n}} \cdot t_{\alpha / 2, n-1} \le \mu \le
+\overline{X} + \frac{S}{\sqrt{n}} \cdot t_{\alpha / 2, n-1}} = 1 - \alpha
+} \\
+@VVV \\
+{
+  \left[\overline{X} - \frac{S}{\sqrt{n}} \cdot t_{\alpha / 2, n-1},
+\overline{X} + \frac{S}{\sqrt{n}} \cdot t_{\alpha / 2, n-1}\right]
+}
+\end{CD}
+$$
+
+Of course, the larger the sample, the **higher the number of degrees of freedom**
+in the Student's T distribution, hence the _smaller percentiles_ $t_{\alpha /
+2, n-1}$, and the _narrower_ the confidence interval.
+
+Not that the CI depends on $n$ through:
+
+- $t_{alpha / 2, n-1}$: the higher $n$, the smaller the value, down until a
+  lower bound $z_{alpha / 2}$ for $n \to \infty$.
+- $\sqrt{n}$: the higher $n$, the smaller the interval.
+- Possibly $\overline{X}, S$, which can however expected to be **stable** with $n$.
+
+This means that we the CI is expected to get **narrower** when we increase the sample
+width.
+
+To better understand what a CI really is, we have to remember that it is a **random
+measure** of a(n unknown) estimated constant parameter.
+
+Therefore computing the 95% CI for the population mean means:
+
+> If we take 100 different samples, and compute the CI for the population
+> mean, then:
+>
+> - 95 times out of 100 the population mean will be **within** that CI
+> - - 5 times out of 100 the population mean will be **outside** that CI
+
+##### 2.7.1.1.1. Exercise: Signal and Noise
+
+> Suppose that a signal having value $\mu$ is transmitted from location $A$.
+> The value received at location $B$ is a Normal Noise with null mean and
+> unknown variance $\sigma^2$.
+> To reduce the decoding error, suppose the same value is sent $9$ times, with
+> the successive values received being: $5, 8.5, 12, 15, 7, 9, 7.5, 6.5, 10.5$
+>
+> a) Construct a 95% CI for $\mu$  
+> b) Repeat the above assuming $\sigma^2 = 4$  
+> c) Is it possible to state in advance whether one of the two confidence
+> intervals will be smaller than the other?
+
+The sample is **small**, however it consist of **Normal RVs**, meaning we can
+apply the above method.
+
+We can start by calculate the sample mean and variance:
+
+$$
+\begin{align*}
+\overline{X} &= \frac{5 + 8.5 + 12 + 15 + 7 + 9 + 7.5 + 6.5 + 10.5}{9} = 9.0 \\
+S^2 &= \frac{1}{9-1} \cdot \sum_{i=1}^{9}{x_i^2 - 9 \cdot 9^2} = 9.5 \\
+S &= \sqrt{9.5} \approx 3.082
+\end{align*}
+$$
+
+Then, we have to compute the values such that:
+
+$$
+\begin{align*}
+P\Set{-t_{\alpha/2, n-1} \le \frac{\overline{X} - \mu}{S / \sqrt{n}} \le
+t_{\alpha/2, n-1}} &= 1 - \alpha \\
+P\Set{\overline{X} - t_{\alpha/2, n-1 } \cdot \frac{S}{\sqrt{n}} \le \mu \le
+\overline{X} + t_{\alpha/2, n-1} \cdot \frac{S}{\sqrt{n}}} &= 1 - \alpha
+\end{align*}
+$$
+
+With $\alpha = 0.05$, this means that $t_{0.025, 8} = 2.306$ and the interval is:
+
+$$
+CI_a = \left(6.63; 11.37\right)
+$$
+
+On point b) we know know that $\sigma^2 = 4$, meaning that we can we use the
+Normal Distribution instead of the Student's T, specifically:
+
+$$
+G = \frac{\overline{X} - \mu}{\sigma / \sqrt{n}} \sim \mathcal{N}(0, 1)
+$$
+
+Meaning:
+
+$$
+\begin{align*}
+  P\Set{-z_{\alpha/2} \le \frac{\overline{X} - \mu}{\sigma / \sqrt{n}} \le
+z_{\alpha/2}} &= 1 - \alpha \\
+  P\Set{\overline{X} - z_{\alpha/2 } \cdot \frac{\sigma}{\sqrt{n}} \le \mu \le
+\overline{X} + z_{\alpha/2} \cdot \frac{\sigma}{\sqrt{n}}} &= 1 - \alpha
+\end{align*}
+$$
+
+With the above values we have that $z_{0.025} = 1.96$ and the interval is:
+
+$$
+CI_b = (7.69; 10.31)
+$$
+
+To answer point c) we have calculated that $CI_b < CI_a$, meaning that the confidence
+interval is **smaller**.
+
+We knew that $z_{\alpha / 2} < t_{alpha / 2, n-1}$, with the first being the
+lower bound of the second when $n \ge 30$, meaning that we could have expected
+the second interval to be smaller than the first.
+
+However, **we could not have known it in advance** since we were not sure
+whether $S$ was bigger/smaller/equal to $\sigma$.
+
+#### 2.7.1.2. Paired Experiments
+
+A common use of CIs is to test if a **measure is significantly different from zero**,
+for example as it happens with **_Paired Experiments_**.
+
+Paired experiments are when two systems $A$ and $B$ are given in input
+**the same workloads** and measured for the same statistics.
+
+In this case, one gets **two paired samples**, namely the $n$ responses of $A$ and
+those of $B$.
+
+However, since there is a 1:1 correspondence between each point in the sample,
+we can compute the **difference of the responses** and treat it as a **single sample**.
+
+If that difference is **significantly different from zero**, then we can
+conclude that _one system is better than the other_.
+
+##### 2.7.1.2.1. Example: Paired Experiments
+
+> Consider a paired experiment where systems $A$ and $B$ are given the same six
+> workloads as an input. Their response times are measured, and the measures are
+> as in the table.
+>
+> Explain if $A$ is better than $B$ with a confidence of 90%.
+
+<div class="flexbox" markdown="1">
+
+|                |  $A$  |  $B$  | $D = A - B$ |
+| :------------: | :---: | :---: | :---------: |
+|      $1$       |  5.4  | 19.1  |    -13.7    |
+|      $2$       | 16.6  |  3.5  |    13.1     |
+|      $3$       |  0.6  |  3.4  |    -2.8     |
+|      $4$       |  1.4  |  2.5  |    -1.1     |
+|      $5$       |  0.6  |  3.6  |     -3      |
+|      $6$       |  7.3  |  1.7  |     5.6     |
+| $\overline{X}$ | 5.32  | 5.63  |    -0.32    |
+|     $S^2$      | 38.22 | 44.06 |    81.62    |
+|      $S$       | 6.18  | 6.64  |    9.03     |
+
+</div>
+
+Before we even start, we must denote that:
+
+- $n$ is small
+- $S$ is big
+
+Just these information should suggest that it is not possible to assert that
+$A$ is better than $B$ with a 90% confidence.
+
+However, we will still do the calculation for the sake of the example.
+
+The first step, since $n = 6 \le 30$, is to check if the difference
+is approximately Normal.
+
+We can check it with a QQ-plot.
+
+<figure class="60">
+<img class="60" src="./images/statistics/qq-plot-paired.png"
+      alt="QQ Plot Paired">
+<figcaption>
+
+With $n = 6$ almost everything will give us a linear equivalence.
+
+</figcaption>
+</figure>
+
+The QQ plot confirms the sample is approximately Normal, so we can proceed with
+the calculation of the 90% CI:
+
+$$
+\begin{align*}
+  \left[\overline{X} - t_{\alpha / 2, n-1} \cdot \frac{S}{\sqrt{n}},
+\overline{X} + t_{\alpha / 2, n-1} \cdot \frac{S}{\sqrt{n}}\right] &= \\
+  \left[-0.32 - t_{0.05, 5} \cdot \frac{9.03}{\sqrt{6}}, -0.32 + t_{0.05, 5}
+\cdot \frac{9.03}{\sqrt{6}}\right] &= \\
+  \left[-0.32 - 2.015 \cdot \frac{9.03}{\sqrt{6}}, -0.32 + 2.015 \cdot
+\frac{9.03}{\sqrt{6}}\right] &= \left[-7.75, +7,11\right]
+\end{align*}
+$$
+
+Therefore, we cannot say with 90% confidence that A is better than B, since
+in our interval $D$ can assume values with both signs.
