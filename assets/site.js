@@ -1,3 +1,35 @@
+/// ============================================================================
+// NED LANGUAGE DEFINITION FOR PRISM
+// ============================================================================
+
+/**
+ * Definisce la grammatica Prism per il linguaggio NED (OMNeT++)
+ */
+function registerNedLanguage() {
+  if (!window.Prism) return;
+
+  Prism.languages.ned = {
+    'comment': {
+      pattern: /\/\/.*|\/\*[\s\S]*?\*\//,
+      greedy: true
+    },
+    'string': {
+      pattern: /"(?:\\.|[^"\\\r\n])*"/,
+      greedy: true
+    },
+    // @display(...), @class(...), @signal[...], ecc.
+    'annotation': /@\w+/,
+    'keyword': /\b(?:package|import|network|module|simple|channel|moduleinterface|channelinterface|extends|like|types|parameters|gates|submodules|connections|allowunconnected|input|output|inout|if|for|in|default|ask|volatile|const|typename|this|parent|sizeof|index|xmldoc|string|bool|int|double|xml|object)\b/,
+    'boolean': /\b(?:true|false)\b/,
+    'function': /\b[a-zA-Z_]\w*(?=\s*\()/,
+    // numeri con eventuale unità di misura attaccata (10ms, 100Mbps, 1.5e3)
+    'number': /\b(?:0x[\da-f]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)[a-zA-Z]*\b/i,
+    // frecce di connessione: -->, <--, <-->
+    'operator': /<-->|-->|<--|\.\.|[-+*\/%=<>!&|^~?:]+/,
+    'punctuation': /[{}[\]();,.]/
+  };
+}
+
 // ============================================================================
 // PRISM CODE HIGHLIGHTING
 // ============================================================================
@@ -21,6 +53,8 @@ function setupPrismCodeBlocks() {
   if (window.Prism && Prism.languages.nasm) {
     Prism.languages.x86asm = Prism.languages.nasm;
   }
+
+  registerNedLanguage();
 
   // Riapplica Prism dopo aver aggiunto le classi
   if (window.Prism) {

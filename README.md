@@ -80,7 +80,7 @@ Requirements for the course are:
 1. [Systems and Simulations](./simulations/Systems%20and%20Simulations)
 1. [Random Number Generators](./simulations/Random%20Number%20Generators)
 1. [How to use Spreadsheets](./How%20to%20use%20Spreadsheets)
-1. [OMNeT++](/simulations/OMNeT%2B%2B)
+1. [OMNeT++](./simulations/OMNeT%2B%2B)
 
 ## 📜 Disclaimer
 

@@ -143,7 +143,7 @@ All these elements can be arbitrarily connected together to form a **network**.
 Let's start with the definition of a **Simple Module** called `Txc`, with two gates,
 one for input and one for output:
 
-```cpp
+```ned
 simple Txc
 {
   gates:
@@ -155,7 +155,7 @@ simple Txc
 To create two instances of the simple module `Txc` to create a network,
 we can define a `network` called `TicToc`:
 
-```cpp
+```ned
 network TicToc
 {
   submodules:
@@ -175,7 +175,7 @@ the modules, which is defined in the `C++` files.
 A module has parameters which can be assigned default values that will e used
 when no actual parameters are given in the network `NED` or `INI` file.
 
-```cpp
+```ned
 simple Txc {
   parameters:
     double procTime = default(10);
@@ -190,7 +190,7 @@ simple Txc {
 When we use the module in a network we can assign values to the parameters,
 which will override the default ones:
 
-```cpp
+```ned
 network Tictoc {
   submodules:
     tic: Txc {
@@ -409,7 +409,7 @@ The FES is accessed by an **event scheduler**, whose main operations are:
   simulation kernel. Events are extracted by arrival time. If two events arrives
   at the same time, it extracts the one with highest priority.
   If two events have the same priority, it extracts the one inserted earlier into
-  the FES
+  the FES.
 - `executeEvent()`: executes the event, which means calling the `handleMessage()`
   method of the module that owns the message.
 
@@ -544,17 +544,17 @@ void Txc::handleMessage(cMessage* msg) {
 To avoid hard-coding number, We can also generate random numbers directly in the
 `NED` code just like we did before:
 
-```cpp
+```ned
 network Tictoc {
   submodules:
     tic: Txc {
       procTime = uniform(0s,10s);
     }
-  [...]
+  // [...]
 }
 ```
 
-```cpp
+```ned
 simple Txc {
   paramaters:
     volatile double procTime @unit("s") = default(uniform(0s,10s));
