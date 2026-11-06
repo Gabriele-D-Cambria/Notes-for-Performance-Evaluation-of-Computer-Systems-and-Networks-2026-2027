@@ -74,6 +74,7 @@ Requirements for the course are:
 1. [Special Discrete Random Variables](./Special%20Discrete%20Random%20Variables)
 1. [Special Continuous Random Variables](./Special%20Continuous%20Random%20Variables)
 1. [Statistics](./Statistics)
+1. [Confidence Intervals](./Confidence%20Intervals)
 
 ### Simulations (Nardini)
 
