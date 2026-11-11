@@ -88,3 +88,8 @@
   color: #E5C07B !important;
   /* Yellow */
 }
+
+.token.builtin {
+  color: #56B6C2 !important;
+  /* Cyan */
+}

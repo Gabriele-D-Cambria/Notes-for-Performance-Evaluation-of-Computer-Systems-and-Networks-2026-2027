@@ -3,30 +3,62 @@
 // ============================================================================
 
 /**
- * Definisce la grammatica Prism per il linguaggio NED (OMNeT++)
+ * Definisce le grammatiche Prism per NED e MSG (OMNeT++)
  */
-function registerNedLanguage() {
+function registerOmnetLanguages() {
   if (!window.Prism) return;
 
+  // Token condivisi tra NED e MSG
+  const comment = {
+    pattern: /\/\/.*|\/\*[\s\S]*?\*\//,
+    greedy: true
+  };
+  const string = {
+    pattern: /"(?:\\.|[^"\\\r\n])*"/,
+    greedy: true
+  };
+  const annotation = /@\w+/;                       // @display, @unit, @customize, ...
+  const boolean = /\b(?:true|false)\b/;
+  const number = /\b(?:0x[\da-f]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)[a-zA-Z]*\b/i;
+  const punctuation = /[{}[\]();,.]/;
+
+  // ---------------------------------------------------------------- NED
   Prism.languages.ned = {
-    'comment': {
-      pattern: /\/\/.*|\/\*[\s\S]*?\*\//,
-      greedy: true
-    },
-    'string': {
-      pattern: /"(?:\\.|[^"\\\r\n])*"/,
-      greedy: true
-    },
-    // @display(...), @class(...), @signal[...], ecc.
-    'annotation': /@\w+/,
+    'comment': comment,
+    'string': string,
+    'annotation': annotation,
     'keyword': /\b(?:package|import|network|module|simple|channel|moduleinterface|channelinterface|extends|like|types|parameters|gates|submodules|connections|allowunconnected|input|output|inout|if|for|in|default|ask|volatile|const|typename|this|parent|sizeof|index|xmldoc|string|bool|int|double|xml|object)\b/,
-    'boolean': /\b(?:true|false)\b/,
+    'boolean': boolean,
     'function': /\b[a-zA-Z_]\w*(?=\s*\()/,
-    // numeri con eventuale unità di misura attaccata (10ms, 100Mbps, 1.5e3)
-    'number': /\b(?:0x[\da-f]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)[a-zA-Z]*\b/i,
-    // frecce di connessione: -->, <--, <-->
+    'number': number,
     'operator': /<-->|-->|<--|\.\.|[-+*\/%=<>!&|^~?:]+/,
-    'punctuation': /[{}[\]();,.]/
+    'punctuation': punctuation
+  };
+
+  // ---------------------------------------------------------------- MSG
+  Prism.languages.msg = {
+    // cplusplus {{ ... }} e cplusplus(Tipo) {{ ... }}: il corpo è C++
+    'cplusplus-block': {
+      pattern: /(\bcplusplus\s*(?:\([^)]*\))?\s*\{\{)[\s\S]*?(?=\}\})/,
+      lookbehind: true,
+      greedy: true,
+      inside: Prism.languages.cpp || {}
+    },
+    'comment': comment,
+    'string': string,
+    'annotation': annotation,
+    // nome subito dopo message/packet/class/struct/enum
+    'class-name': {
+      pattern: /(\b(?:message|packet|class|struct|enum)\s+)[a-zA-Z_]\w*/,
+      lookbehind: true
+    },
+    'keyword': /\b(?:namespace|cplusplus|import|struct|message|packet|class|enum|abstract|extends|noncobject|readonly|properties|fields)\b/,
+    'builtin': /\b(?:unsigned|string|bool|char|short|int|long|double|float|int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t)\b/,
+    'boolean': boolean,
+    'function': /\b[a-zA-Z_]\w*(?=\s*\()/,
+    'number': number,
+    'operator': /[-+*\/%=<>!&|^~?:]+/,
+    'punctuation': punctuation
   };
 }
 
@@ -54,7 +86,7 @@ function setupPrismCodeBlocks() {
     Prism.languages.x86asm = Prism.languages.nasm;
   }
 
-  registerNedLanguage();
+  registerOmnetLanguages();
 
   // Riapplica Prism dopo aver aggiunto le classi
   if (window.Prism) {

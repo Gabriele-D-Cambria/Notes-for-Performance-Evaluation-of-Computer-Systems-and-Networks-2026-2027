@@ -20,8 +20,14 @@ title: OMNeT++
   - [2.5. Hierarchy of Modules](#25-hierarchy-of-modules)
   - [2.6. Providing Random Inputs](#26-providing-random-inputs)
   - [2.7. Text-based output](#27-text-based-output)
-  - [2.8. Defining Scenarios](#28-defining-scenarios)
-  - [2.9. Collecting Metrics](#29-collecting-metrics)
+  - [2.8. Collecting Metrics](#28-collecting-metrics)
+  - [2.9. Defining Scenarios](#29-defining-scenarios)
+    - [2.9.1. Running Different Experiments](#291-running-different-experiments)
+  - [2.10. Handling Output Files](#210-handling-output-files)
+  - [2.11. Compound Modules](#211-compound-modules)
+    - [2.11.1. Cross-Module Calls](#2111-cross-module-calls)
+    - [2.11.2. Internal Connections](#2112-internal-connections)
+  - [2.12. Message Definition](#212-message-definition)
   <!--toc:end-->
 
 # 2. OMNeT++
@@ -472,7 +478,7 @@ void Txc::initialize() {
 void Txc::handleMessage(cMessage *msg) {
   if (msg->isName("tictocMsg")) {
     simtime_t time = par("procTime"); // recovers the parameter of the module
-    sheduleAt(simTime() + time, beep_);
+    scheduleAt(simTime() + time, beep_);
 
     tictocMsg_ = msg;     // store for later transmission
   }
@@ -585,32 +591,7 @@ Their destination of the `EV` streams depends on how simulation are run:
 - **GUI**: the log is written in the specific area of the main window
 - **CLI**: the log is not displayed anywhere.
 
-## 2.8. Defining Scenarios
-
-To be able to assign actual parameters of a simulation, overwriting the
-default values in the `NED` file, we use **INI files**.
-
-The `INI` files will be organized in multiple **configurations**, that inherit
-parameters to the `General` one.
-
-```ini
-[General]
-network = Tictoc
-sim-time-limit = 100s
-# ...
-
-[Config Test1]
-description = "First TicToc campaing"
-# This uses `*` as a wildcard
-Tictoc.t*c.proctime = 50ms
-
-[Config specificTest]
-# inherits from Test1 and adds further values
-extends = Test1
-sim-time-limit = 5s
-```
-
-## 2.9. Collecting Metrics
+## 2.8. Collecting Metrics
 
 The output of the system can be observed with **signals**.
 
@@ -635,3 +616,402 @@ in `C++` code in order to use them for storing values.
 Alternatively, we can record statistics using the simulation library directly
 (e.g., using/deriving the `cStatistics` class), although the resulting recording
 will be hard-coded in modules.
+
+To use a signal we first have to define a **signal** and a **statistic**
+inside the `NED` file.
+
+The _statistic_ will record data coming from a signal defined as "source",
+and can held more than one type of recording (e.g., mean, sum, count, etc.).
+
+We differentiate between:
+
+- **_Scalar_ metrics** : they are a synthesis of the values assumed by a certain
+  metric during the whole simulation. They are useful when studying the _steady
+  state behavior_ of a system (e.g., average delay) or _cumulative values_ (e.g.,
+  sum of sent messages).
+- **_Vector_ metrics**: they are useful when observing the "evolution" of the status
+  system, since each value "emitted" is stored in the `@statistic` _with its
+  emission time_. This way we can recover those values and plot them in a graph
+  to observe the evolution of the system. They usually require more memory.
+
+```ned
+simple Txc {
+    // ...
+  parameters:
+    @signal[delay](type=long);
+    @statistic[delayStat](source=delay; record=mean;);
+
+  // ...
+}
+```
+
+After that, inside the `C++` class definition, we have to **define
+a variable** with type `simsignal_t`:
+
+```cpp
+class Txc : public cSimpleModule {
+  private:
+    simsignal_t delaySignal_;
+    // ...
+};
+```
+
+Then, in the `initialize()` method we have to **register the signal**
+through the `registerSignal()` function:
+
+```cpp
+void Txc::initialize() {
+  // ...
+
+  /**
+    * The string passed as parameter must be the signal name
+    * defined in the NED file.
+    *
+    * The function returns the ID of the signal
+    */
+  delaySignal_ = registerSignal("delay");
+  // ...
+}
+```
+
+To actually write values into the signal, we can use the `emit()` function:
+
+```cpp
+// somewhere in the code, typically in `handleMessage()`
+
+// ...
+emit(delaySignal_, value);
+// ...
+```
+
+## 2.9. Defining Scenarios
+
+To be able to assign actual parameters of a simulation, overwriting the
+default values in the `NED` file, we use **INI files**.
+
+The `INI` files will be organized in multiple **configurations**, that inherit
+parameters to the `General` one.
+
+```ini
+[General]
+network = Tictoc
+sim-time-limit = 100s
+# ...
+
+[Config Test1]
+description = "First TicToc campaing"
+# This uses `*` as a wildcard
+Tictoc.t*c.proctime = 50ms
+
+[Config specificTest]
+# inherits from Test1 and adds further values
+extends = Test1
+sim-time-limit = 5s
+```
+
+Once our model is ready and implemented, we have do **define our simulation
+scenarios** by specifying:
+
+- **Simulation Parameters**: they are the parameters whose **value** may
+  be already defined in the `NED` file, but we might want to **override** in
+  the `INI` file.
+- **Model Factors**: they are parameters whose **different values** we want
+  to explore during the simulation campaign.
+
+> [!TIP]
+> In `OMNeT++` they both are modeled as _parameters_. A quick way do differentiate
+> them is understanding that for a fixed simulation:
+>
+> - _Simulation Parameters_ hold a **fixed value**
+> - _Model Factors_ hold different values, which are explored in a **simulation
+>   campaign**.
+
+### 2.9.1. Running Different Experiments
+
+By setting different values for the model factors, we can run different experiments.
+
+In particular, we can define a **simulation campaign** by defining a **set of
+experiments** that will be run one after the other.
+
+For example, defining:
+
+```ini
+*.tic.procTime = ${1, 10}s
+*.toc.procTime = ${1, 10}s
+```
+
+We automatically create **4 different runs**, one for each combination of the
+parameters.
+
+<img class="" src="./images/omnet/omnet_experiments.png"
+      alt="OMNeT++ Experiments"/>
+
+Supposing we are measuring a statistic (e.g., average delay), each run will
+produce its own value, according to the `NED` file. This way we can easily compare
+them.
+
+If we want to run each configuration multiple times, we can use the `repeat` parameter:
+
+```ini
+repeat = 10
+seed-set = ${repetition}
+
+*.tic.procTime = ${1, 10}s
+*.toc.procTime = ${1, 10}s
+```
+
+This will make the simulation run each configuration 10 times, each time with a
+**different RNG seed**.
+
+Each run of a configuration will have its `repetition_id`, going from `0` to `9`,
+which will be used to generate the seed for the RNG, because of the
+`seed-set = ${repetition}` option.
+
+This means that the first run of each configuration will be run **with the
+same seed**, as well as the second run, and so on.
+
+> [!CAUTION]
+> If we didn't added the `seed-set` parameter, `OMNeT++` would have used
+> a different seed for each run.  
+> Thus, the first run of each configuration would have been run with a different
+> seed, making the comparison of the results **not fair**.
+
+Using repetition allows us to **average the results** of each independent repetition
+for each configuration, and plot the confidence interval as well.
+
+<img class="" src="./images/omnet/omnet_repetitions.png"
+      alt="OMNeT++ Repetitions"/>
+
+Other typical simulation parameters that can be set in the `INI` file are:
+
+- `sim-time-limit`: the maximum simulation time, after which the simulation
+  will terminate.
+- `warmup-period`: the warm-up period, which is the time after which the
+  simulation will start collecting statistics. This is useful to avoid collecting
+  statistics during the transient phase of the simulation.
+- `repeat`: the number of repetitions for each configuration.
+- `seed-set`: the seed set for the RNG, which can be set to `${repetition}` to
+  have a different seed for each repetition.
+
+## 2.10. Handling Output Files
+
+When running a simulation campaign, `OMNeT++` will generate two
+**output files** for each run:
+
+- **Output Scalar File (`.sca`)**
+- **Output Vector File (`.vec`)**
+
+This files will be stored into the folders defined by the respective
+parameters in the `INI` file.
+
+By default the names are set as:
+
+```ini
+output-scalar-file = ${resultdir}/${configname}-${runnumber}.sca
+output-vector-file = ${resultdir}/${configname}-${runnumber}.vec
+```
+
+In order to make it simpler to link a specific output file to a simulation
+configuration, allowing us to easily remember which output file corresponds
+to which configuration, we can **assign names to iteration variables**:
+
+```ini
+*.tic.delay = ${dtic=1,10}
+*.toc.delay = ${dtoc=1,10}
+
+output-scalar-file = ${resultdir}/${configname}/${iterationvars}-${repetition}.sca
+output-vector-file = ${resultdir}/${configname}/${iterationvars}-${repetition
+```
+
+This will create **a different directory for each configuration**, and save
+inside the output files.
+
+The `$iterationvars` variable will be automatically replaced by the names of the
+iteration variables and their values: `dtic=1_dtoc=1`, `dtic=1_dtoc=10`,
+`dtic=10_dtoc=1`, `dtic=10_dtoc=10`.
+
+> [!WARNING]
+> If we forget to add `${repetition}`, all the repetitions for the same combination
+> of iteration vars will collide in the same output file.
+
+Both `.sca` and `.vec` files can be examined inside `OMNeT++` IDE, or using a
+third file with extension `.anf`, and by just _dragging and dropping_ the
+two files inside the opened `.anf` file.
+
+## 2.11. Compound Modules
+
+If we consider more complex systems, like a _client-server architecture_,
+from a high-level perspective we just need to consider the behaviour of
+the involved node as a whole.
+
+We can model them as **modules**, thus associate to them an atomic
+behavior.
+
+When implementing a complex system module, we can model each component
+as a **simple module** as well.
+
+```ned
+module PC {
+  parameters:
+    int cpuSpeed;
+    int monitorSize;
+  gates:
+    // ...
+  submodules:
+    hd : HardDisk;
+    wifi: WiFi;
+    explorer : Browser;
+  connections:
+    // ...
+}
+```
+
+Where `HardDisk`, `WiFi` and `Browser` are all simple modules, each with its own
+behavior.
+
+A simple module inside a compound one may want to obtain its "father" parameters.
+This is possible by using the `getParentModule()` function, which returns a
+pointer to the _parent module_.
+
+```cpp
+// Within the Explorer C++ class
+cModule* pc;
+pc = getParentModule();
+
+int size = pc->par("monitorSize");
+```
+
+Also the compound module can get the parameters of is sub-modules:
+
+```cpp
+// Inside the PC C++ class
+
+// Not recommended approach
+cModule* hd = pc->getSubmodule("hd");
+int hdSize = hd->par("hdSize");
+
+// This approach is better
+cModule* hd = pc->getHardDiskSubmodule();
+int size = hd->getSize();
+```
+
+> [!WARNING]
+> The first approach is not recommended since we **need to actually know
+> the _exact name_ of both the sub-module and the parameter**. This makes the code
+> less flexible in case we assign the sub-module a different name.
+
+### 2.11.1. Cross-Module Calls
+
+Sometimes there may be the need for two nodes to interact without messages.
+
+This can be achieved by keeping a reference to the other module (a `cModule` pointer).
+
+We may model this extraction through a **_Oracle Module_**: a supernatural
+entity of the systems which knows everything about the system and can provide
+information to the modules.
+
+```cpp
+cModule* temp;
+temp = findModuleByPath("oracle");
+
+OracleClass* oracle;
+oracle = check_and_cast<OracleClass*>(temp);  // Dynamic cast with error checking
+
+int serverId;
+serverId = oracle->aSearchFunction("server");
+
+int serverIP = serverId->getIP();
+```
+
+> [!CAUTION]
+> **Cross-module calls** are to be used only with **setters** and **getters**.  
+> If we were, for example, to send a message through a cross-module call, we
+> would be sending from another source, messing with the whole simulation.
+
+### 2.11.2. Internal Connections
+
+<div class="grid2">
+<div class="">
+When considering simple modules, we always connected gates according
+to the pattern `output --> input`, as our idea was to _send
+something though gates_ rather than _towards nodes_.
+
+When considering compound modules, we is still true for external connections,
+but its a bit different for internal connections.
+
+To connect an internal module gate to the compound module gate, we have to connect
+`output --> output` or `input <-- input`, not as much as a connection to send a
+message, bu as a connection between two _interfaces_.
+
+```ned
+module C {
+  parameters:
+    // ...
+  gates:
+    output out;
+
+  submodules:
+    a: A;
+    b: B;
+
+  connections:
+    out <-- a.out1;   // output --> output
+    a.out2 --> b.in;  // output --> input
+}
+```
+
+</div>
+<div class="">
+<img class="80" src="./images/omnet/omnet_internal_connections.png"
+      alt="OMNeT++ Internal Connections"/>
+</div>
+</div>
+
+## 2.12. Message Definition
+
+So far, we have seen messages "just" as a way to **trigger an event at a specific
+module**.
+
+However, `OMNeT++` messages **can also include data** that needs to travel from
+the source module to the destination module. This is actually what one would expect
+from a message, that is carrying data.
+
+`OMNeT++` provides a `cMessage` class, which can be used to redefine our own
+messages.
+
+This way we can **extend** the `cMessage` to make it include new fields,
+along with the corresponding getter and setter methods.
+
+We can define new messages by creating a **message file** with the `.msg` extension.
+
+The syntax is the same as `NED`.
+
+When we build our project, the environment will **automatically generate a new
+C++ class** (both `.h` and `.cpp`), derived from `cMessage` and extended
+with the new fields.
+
+```msg
+message MyMessage {
+  char source;
+  int type;
+}
+```
+
+We can now use our new `MyMessage` class whenever we want, just by including
+the generated header file:
+
+```cpp
+#include "myMessage_m.h"
+
+// Somewhere in module A
+MyMessage* msg = new MyMessage(msgName);
+msg->setSource('A');
+
+// Somewhere in module B
+MyMessage* tmpMsg;
+tmpMsg = check_and_cast<MyMessage*>(msg);
+char source = tempMsg->getSource();
+// ...
+
+delete tmpMsg;
+```
