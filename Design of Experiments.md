@@ -12,6 +12,7 @@ title: Design of Experiments
   - [2.2. Full Factorial Design](#22-full-factorial-design)
   - [2.3. 2kr Factorial Design](#23-2kr-factorial-design)
   - [2.4. 2k Factorial Analysis](#24-2k-factorial-analysis)
+  - [2.5. 2kr Factorial Analysis](#25-2kr-factorial-analysis)
   <!--toc:end-->
 
 # 2. Design of Experiments
@@ -150,8 +151,8 @@ tune our system for maximum performance.
 
 ## 2.3. 2kr Factorial Design
 
-This is a third technique, which allows us to reap **most of the benefits** of the
-previous two, at a moderate implementation cost.
+This is a third technique which allows us to reap **most of the benefits** of the
+previous, at a moderate implementation cost.
 
 It consists in exploring **only the combinations of _extremes_ of the factor levels**.
 This way we can assess the **relative importance** of factors in our metric,
@@ -265,12 +266,14 @@ In the general case, if we have 2 factors, we need 4 experiments (2 factors time
 
 <div class="flexbox" markdown="1">
 
-| Experiment | $0$  | $A$  | $B$  | $AB$ |  $y$  |
-| :--------: | :--: | :--: | :--: | :--: | :---: |
-|     1      | $+1$ | $-1$ | $-1$ | $+1$ | $y_1$ |
-|     2      | $+1$ | $+1$ | $-1$ | $-1$ | $y_2$ |
-|     3      | $+1$ | $-1$ | $+1$ | $-1$ | $y_3$ |
-|     4      | $+1$ | $+1$ | $+1$ | $+1$ | $y_4$ |
+| Experiment |  $I$   |  $A$   |  $B$   |   $AB$    |    $y$     |
+| :--------: | :----: | :----: | :----: | :-------: | :--------: |
+|     1      |  $+1$  |  $-1$  |  $-1$  |   $+1$    |   $y_1$    |
+|     2      |  $+1$  |  $+1$  |  $-1$  |   $-1$    |   $y_2$    |
+|     3      |  $+1$  |  $-1$  |  $+1$  |   $-1$    |   $y_3$    |
+|     4      |  $+1$  |  $+1$  |  $+1$  |   $+1$    |   $y_4$    |
+|            | $4q_0$ | $4q_A$ | $4q_B$ | $4q_{AB}$ |  **Sum**   |
+|            | $q_0$  | $q_A$  | $q_B$  | $q_{AB}$  | **Coeff.** |
 
 </div>
 
@@ -283,3 +286,164 @@ We can observe that
 
 Therefore, in the end, we **don't have to use matrix algebra to solve the linear
 system**, we just need to look at the signs and do some easy sums.
+
+The important thing about factorial analysis is that it allows us
+to determine the **relative importance of the factors** through a procedure
+called **_analysis of variation (ANOVA)_**.
+
+This can be done by first computing the **sum of squares total (SST)** of
+the observed response:
+
+$$
+  SST = \sum_{i=1}^{2^k} (y_i - \overline{y})^2
+$$
+
+This is the **total variation** of the response variable.
+
+We can prove that the same variable can also be computed as:
+
+$$
+SST = 2^k \cdot q_A^2 + 2^k \cdot q_B^2 + 2^k \cdot q_{AB}^2 = SSA + SSB + SSAB
+$$
+
+> [!NOTE]
+> The above demonstration is present in the official notes of the course.
+
+We can then compute the **fraction of variation by factor** $x$ as:
+
+$$
+f_x = \frac{SSx}{SST}
+$$
+
+In our example, our mean value is $\overline{y} = 40$, and the total variation is
+
+$$
+  SST = (15 - 40)^2 + (45 - 40)^2 + (25 - 40)^2 + (75 - 40)^2 = 2100
+$$
+
+We can then simply compute the fraction of variation for each factor:
+
+- $A \to \frac{4 \cdot 20^2}{2100} = 0.762$
+- $B \to \frac{4 \cdot 10^2}{2100} = 0.190$
+- $AB \to \frac{4 \cdot 5^2}{2100} = 0.048$
+
+Meaning that $72.6\%$ of variation is due to RAM, $19.0\%$ to cache size,
+and $4.8\%$ to the interaction of both.
+
+## 2.5. 2kr Factorial Analysis
+
+This also overcomes the limitation of _factorial analysis_ that does not account
+for **experimental errors**.
+
+In this case we model our system slightly differently:
+
+$$
+y = q_0 + q_A x_A + q_B x_B + q_{AB} x_A x_B + \varepsilon
+$$
+
+The procedure to estimate the $q_i$ coefficients maintains the same steps, but we
+need to **replicate the experiments** $r$ times, and compute the **sample mean**
+over the replications.
+
+Analyzing the RAM-cache problem, and assuming $r = 3$, he get three results:
+
+<div class="flexbox" markdown="1">
+
+| Experiment |  $I$   |  $A$   |  $B$   |   $AB$    |      $y_1$       | $y_2$ | $y_3$ | Sample Row Mean<br>$y_m$ |
+| :--------: | :----: | :----: | :----: | :-------: | :--------------: | :---: | :---: | :----------------------: |
+|     1      |  $+1$  |  $-1$  |  $-1$  |   $+1$    |       $15$       | $15$  | $12$  |           $15$           |
+|     2      |  $+1$  |  $+1$  |  $-1$  |   $-1$    |       $45$       | $45$  | $51$  |           $48$           |
+|     3      |  $+1$  |  $-1$  |  $+1$  |   $-1$    |       $25$       | $25$  | $24$  |           $24$           |
+|     4      |  $+1$  |  $+1$  |  $+1$  |   $+1$    |       $75$       | $75$  | $81$  |           $77$           |
+|            | $4q_0$ | $4q_A$ | $4q_B$ | $4q_{AB}$ | **Sum of** $y_m$ |       |       |                          |
+|            | $q_0$  | $q_A$  | $q_B$  | $q_{AB}$  |    **Coeff.**    |       |       |                          |
+
+</div>
+
+Once we have computed the values for the coefficients, we have something like this
+(in our case):
+
+$$
+y = 41 + 21.5q_A + 9.5q_B + 5q_{AB} + \varepsilon
+$$
+
+We can now estimate the **experimental errors** and the **Sum of Squared Errors
+(SSE)**.
+
+We first compute for each _sample row mean_ the _sample error_:
+
+ <div class="flexbox" markdown="1">
+
+|   ...    | $y_1$ | $y_2$ | $y_3$ | Sample Row Mean<br>$y_m$ | $y_1 - y_m$ | $y_2 - y_m$ | $y_3 - y_m$ |
+| :------: | :---: | :---: | :---: | :----------------------: | :---------: | :---------: | :---------: |
+|          | $15$  | $15$  | $12$  |           $15$           |     $0$     |     $3$     |    $-3$     |
+|          | $45$  | $45$  | $51$  |           $48$           |    $-3$     |     $0$     |     $3$     |
+|          | $25$  | $25$  | $24$  |           $24$           |     $1$     |     $4$     |    $-5$     |
+|          | $75$  | $75$  | $81$  |           $77$           |    $-2$     |    $-2$     |     $4$     |
+| **Sum**  |       |       |       |                          |    $-4$     |     $5$     |    $-1$     |
+| **Mean** |       |       |       |                          |    $-1$     |   $1.25$    |   $-0.25$   |
+| **SSQ**  |       |       |       |                          |    $14$     |    $29$     |    $59$     |
+
+</div>
+
+From these we can compute the _sum_, _mean_ and _SSQ_.
+
+The _SSE_ can be computed as the sum of the _SSQ_, producing a similar equation
+as before:
+
+$$
+\sum_{i,j}(y_{i,j}-\overline{y_i})^2 =
+2^k \cdot r \cdot q_A^2 + 2^k \cdot r \cdot q_B^2 + 2^k \cdot r \cdot q_{AB}^2 +
+\sum_{i,j} \varepsilon_{i,j}^2
+  = SSA + SSB + SSAB + SSE
+$$
+
+Where $\overline{y}$ is the **mean response _over the whole results matrix_**.
+
+The fraction $\frac{SSE}{SST}$ is called **unexplained variation**, and should be
+as small as possible.
+
+There are a couple of _subtleties_ we have not addressed so far:
+
+The first one is that we are using a **random sample**, hence our effects
+(i.e., coefficients) are **random variables**. This means that it is fundamental
+to **compute a confidence interval for our measurements**.
+
+Note that in the example above, the CI for factor $B$ is $[-3, 15]$, meaning
+that **we cannot conclude that the effect of cache is significant**.
+
+The other missing piece is that the above **non-linear regression model**
+works only under the assumption that:
+
+> Residuals (errors) are **IID Normal RV** with a _null mean_ and a _constant
+> standard deviation_.
+
+These hypotheses need to be **tested** with the standard test we have seen so far:
+
+- **Normality**: _QQ-plot_ of the residuals
+- **Standard deviation**: _residuals / (average) predicted response_ plot
+- **IID**: _residuals / experiment number_ plot. However, if we do not know
+  how the sequence of observation was generated, this becomes pointless.
+
+Only when we have verified all the above, we can **compute confidence intervals
+for the effects** based on the **error variance**:
+
+$$
+\sigma_e^2 = \frac{SSE}{2^k \cdot (r - 1)}
+$$
+
+> [!NOTE]
+> The term at the denominator accounts for the fact that the _degrees of freedom_
+> for the error is $(r-1)$ per configuration (since their sum must be zero)
+
+Thus, the confidence interval for all the effects can be computed as:
+
+$$
+q_i \mp t_{\alpha/2, \left(2^k(r-1)\right)} \cdot \sqrt{\frac{\sigma_e^2}{2^k r}}
+$$
+
+Where $t$ is the _percentile of the Student's t distribution_ with $2^k(r-1)$
+degrees of freedom.
+
+Any effects whose confidence interval contains zero is **not significant** and
+can be discarded.
