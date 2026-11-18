@@ -28,6 +28,10 @@ title: OMNeT++
     - [2.11.1. Cross-Module Calls](#2111-cross-module-calls)
     - [2.11.2. Internal Connections](#2112-internal-connections)
   - [2.12. Message Definition](#212-message-definition)
+  - [2.13. Connecting Gates](#213-connecting-gates)
+  - [2.14. MultiStage Initialization](#214-multistage-initialization)
+  - [2.15. NED Inheritance](#215-ned-inheritance)
+  - [2.16. Using Multiple RNG](#216-using-multiple-rng)
   <!--toc:end-->
 
 # 2. OMNeT++
@@ -645,6 +649,13 @@ simple Txc {
 }
 ```
 
+> [!WARNING]
+> When we have time-dependent metrics, we should not use a `mean` signal, but rather
+> a `timeavg` signal, which is computed as the integral of the signal over time
+> divided by the total time.  
+> This is because the mean signal is computed as the sum of the values divided by
+> the number of values, which is not correct when the values are time-dependent.
+
 After that, inside the `C++` class definition, we have to **define
 a variable** with type `simsignal_t`:
 
@@ -1015,3 +1026,235 @@ char source = tempMsg->getSource();
 
 delete tmpMsg;
 ```
+
+## 2.13. Connecting Gates
+
+In some cases, we may want to model _wireless communications_.
+
+In this case, the devices are not physically connected through a wire,
+but they communicate through a wireless channel.
+
+Although we can model the wireless channel just like a wired connection,
+it is not the best approach, since **mobile** devices move, it is possible
+that they will change their position, and thus the connection between them
+and an access point may be lost or redirected to another access point.
+
+This is hard to model using physical connections like the ones seen
+up to now.
+
+Instead, we use another paradigm.
+
+In the `NED` file we define for each device a `wirelessGate` input,
+specifying the `@directIn` property:
+
+```ned
+module WirelessDevice {
+  parameters:
+    // ...
+  gates:
+    input wirelessGate @directIn;
+    // ...
+}
+```
+
+Such property specifies that a device can receive message on that gate
+**even if there are no connection attached to it**.
+
+To send to this interface, in the `C++` we do not use the `send()` function,
+but the `sendDirecr()`, for which we have to specify several parameters:
+
+```cpp
+destModule = findModuleByPath("<destinationModulePath>"); // Or use the `oracle-module`
+destGate = destModule->gate("wirelessGate");              // Or use a getter
+
+sendDirect(
+  msg,                // The actual message to send
+  propagationDelay,   // The propagation delay of the message
+  txDuration,         // The transmission duration of the message
+  destModel,          // Destination module
+  destGate            // Destination gate
+)
+```
+
+## 2.14. MultiStage Initialization
+
+We can ask the system to perform initialization in multiple stages, which means
+to call the `initialize()` method of each module multiple times.
+
+Each time we can redefine the function `numInitStages()` in order to
+specify the number of initialize calls for that module.
+
+In this case, the `initialize()` method will be called multiple times, each
+time with a different `stage` parameter, which increases from `0`.
+
+```cpp
+class MyModule : public cSimpleModule {
+  protected:
+    virtual int numInitStages() const override { return 2; }
+
+    virtual void initialize(int stage) override {
+      if (stage == 0) {
+        // Do something
+      }
+      else if (stage == 1) {
+        // Do something else
+      }
+    }
+};
+```
+
+## 2.15. NED Inheritance
+
+Just like in `C++`, also `NED` allows us to define a **base module** and then
+extend it to create **derived modules**.
+
+For example, thinking about our `Tic` and `Toc` modules, we can define
+a base module `Txc` and then extend it to create `Tic` and `Toc`:
+
+```ned
+simple Txc {
+  parameters:
+    bool sendMsgOnInit = default(false);
+
+  gates:
+    input in;
+    output out;
+}
+```
+
+```ned
+simple Tic extends Txc {
+  parameters:
+    sendMsgOnInit = true;
+}
+```
+
+```ned
+simple Toc extends Txc {
+  parameters:
+    sendMsgOnInit = false;
+}
+```
+
+We can then proceed to model also the `C++` classes, by defining a base class
+`Txc` and then extending it to create the `Tic` and `Toc` classes.
+
+```cpp
+class Txc : cSimpleModule {
+  virtual void fun1();
+}
+```
+
+```cpp
+class Tic : public Txc {
+  virtual void fun1();
+}
+```
+
+```cpp
+class Toc : public Txc {
+  virtual void fun1();
+}
+```
+
+In this case, to link the derived NED module to the derived C++ class, we have
+to use the `@class` property inside the NED module definition:
+
+```ned
+simple Tic extends Txc {
+  parameters:
+    sendMsgOnInit = true;
+  @class(Tic);
+}
+
+// Same for Toc
+```
+
+## 2.16. Using Multiple RNG
+
+We saw that by default in the `INI` file:
+
+- `set-seed = ${runnumber}` means that each run get a different set of seeds
+- `set-seed = ${repetition}` means that repetition `i` of each experiment
+  will have the same seed
+
+In `OMNeT++` we can configure and use a number of **independent RNGs**.
+
+By default, the simulator defines one **physical RNG** (but we can
+change this number).
+
+Each module will then have **his own set of local RNGs**, with each _mapped_
+to one physical RNG.
+
+Supposing we have a node generating _random-sized packets_, at _random time
+intervals_. For this purpose it makes sense to use **two different RNGs** for
+each random variable, so that the two random variables are independent.
+
+To do that we need to increase the number of physical RNGs, and then map each
+module to a different one.
+
+```ini
+num-rngs = 2
+
+**.nodeA.rng-0 = 0
+**.nodeA.rng-1 = 1
+```
+
+Had we not done this, both random variables would have been generated using the
+same RNG, which meant that sending a packet of a certain size would have been
+correlated with the time of the next packet, which is not what we want.
+
+To propagate this decision in the `C++` code, we need to specify the RNG
+each time we call a distribution function:
+
+```cpp
+size = uniform(s0, s1, 0);                  // Use RNG-0
+nextPacketTime = exponential(1/lambda, 1);  // Use RNG-1
+```
+
+If we introduced another node whose job is the same, for a perfectly fair
+comparison we should map it to yet another two different random number generators,
+so that also the two nodes are independent.
+
+```ini
+num-rngs = 4
+
+**.nodeA.rng-0 = 0
+**.nodeA.rng-1 = 1
+**.nodeB.rng-0 = 2
+**.nodeB.rng-1 = 3
+```
+
+This **won't need any change** in the `C++` logic, since the `C++` code will
+still use the same RNG indexes, but now they will be mapped to different
+physical RNGs, thus making the two nodes independent.
+
+We can also use _wildcards_ and _expressions_ to automatically map the modules
+to different RNGs, which will allow us to avoid hard-coding the mapping in the
+`INI` file.
+
+```ini
+num-rngs = ${N} * <num_of_rng_per_module>
+
+**.node[*].rng-0 = ancestorIndex(0) * <num_of_rng_per_module> + 0
+**.node[*].rng-1 = ancestorIndex(0) * <num_of_rng_per_module> + 1
+**.node[*].rng-2 = ancestorIndex(0) * <num_of_rng_per_module> + 2
+// ...
+```
+
+The `accestorIndex(0)` function returns the index of the module in the array of
+modules.
+
+> [!CAUTION]
+> We do not need to _always_ use multiple RNGs, but we should do it when
+> out simulation involves **independent stochastic components**, whose
+> random draws should not affect each other's sequence, or when reproducibility
+> across the configuration changes matters.
+>
+> For instance, having four sources randomly generating traffic and one sink:
+>
+> - Measuring the **overall throughput**: it is not necessary to use multiple RNGs,
+>   since we are interested in the aggregate statistic
+> - Measuring the **per-user throughput**: it is necessary to use multiple RNGs,
+>   since different random sequences can alter individual results or introduce
+>   bias.

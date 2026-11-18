@@ -85,6 +85,7 @@ Requirements for the course are:
 1. [Random Number Generators](./simulations/Random%20Number%20Generators)
 1. [How to use Spreadsheets](./How%20to%20use%20Spreadsheets)
 1. [OMNeT++](./simulations/OMNeT%2B%2B)
+1. [Output data Analysis](./simulations/Output%20data%20Analysis)
 
 ## 📜 Disclaimer
 
