@@ -1,5 +1,5 @@
 ---
-title: Queuing Theory
+title: Queuing Theory - MM1 Systems
 ---
 
 # 1. Index
@@ -19,6 +19,12 @@ title: Queuing Theory
       - [2.2.2.2. Mean Response Time](#2222-mean-response-time)
       - [2.2.2.3. Mean Waiting Time](#2223-mean-waiting-time)
       - [2.2.2.4. Throughput](#2224-throughput)
+    - [2.2.3. Alternative way to compute Mean Performance Indexes](#223-alternative-way-to-compute-mean-performance-indexes)
+    - [2.2.4. Arrival Time and Random Observer Probabilities](#224-arrival-time-and-random-observer-probabilities)
+    - [2.2.5. Distribution of Response and Waiting Times](#225-distribution-of-response-and-waiting-times)
+      - [2.2.5.1. Response Time Distribution](#2251-response-time-distribution)
+      - [2.2.5.2 Waiting Time Distribution](#2252-waiting-time-distribution)
+      - [2.2.5.3. Exercise: Doubling Website Rate of Contacts](#2253-exercise-doubling-website-rate-of-contacts)
       <!--toc:end-->
 
 # 2. Queuing Theory
@@ -911,3 +917,479 @@ $$
 \gamma = \mu \cdot \sum_{n=1}^{+\infty} p_n = \mu \cdot (1 - p_0) = \mu \cdot \rho
 = \lambda
 $$
+
+### 2.2.3. Alternative way to compute Mean Performance Indexes
+
+Sometimes, computing the steady.state probabilities using the direct
+approach becomes challenging.
+
+In many cases, we can compute the _Mean Performance Indexes_ **without**
+computing the SS probabilities.
+
+We will see a **general** method for any birth-death system, exemplified
+on the M/M/1 for simplicity.
+
+Consider the **global steady-state** equations:
+
+$$
+\begin{cases}
+  \lambda p_0 = \mu p_1 & n = 0 \\
+  (\lambda + \mu)p_n = \mu p_{n+1} + \lambda p_{n-1} & n \ge 1 \\
+\end{cases}
+$$
+
+The technique consists in **multiplying each equation by** $z^n$, where $z \in \Complex$
+and $\vert z \vert < 1$, and then **summing all the equations**:
+
+$$
+\begin{CD}
+\begin{cases}
+  \lambda z^0 p_0 = \mu p_1 z^0 & n = 0 \\
+  (\lambda + \mu)p_n \cdot z^n = \mu p_{n+1} \cdot z^n + \lambda p_{n-1} \cdot z^n
+& n \ge 1
+\end{cases} \\
+@VVV \\
+{
+  \lambda \cdot z^0 p_0 + \sum_{n=1}^{+\infty} (\lambda + \mu)p_n \cdot z^n
+  = \mu \cdot z^0 p_1 + \sum_{n=1}^{+\infty} \mu p_{n+1} \cdot z^n + \sum_{n=1}^{+\infty}
+  \lambda p_{n-1} \cdot z^n
+}
+\end{CD}
+$$
+
+We can recall the definition of **PGF of discrete non-negative RV**:
+
+$$
+P(z) := E[z^N] = \sum_{k=0}^{+\infty}{z^k p_k}
+$$
+
+In this case, the system $N$ _is_ a discrete and non-negative RV, thus can be
+manipulated as:
+
+$$
+\begin{align*}
+  \lambda \cdot z^0 p_0 + \sum_{n=1}^{+\infty} (\lambda + \mu)p_n \cdot z^n
+&= \mu \cdot z^0 p_1 + \sum_{n=1}^{+\infty} \mu p_{n+1} \cdot z^n + \sum_{n=1}^{+\infty}
+\lambda p_{n-1} \cdot z^n \\
+  -\mu \cdot p_0 + (\lambda + \mu) \sum_{n=0}^{+\infty} p_n z^n &= \lambda
+\cdot z \cdot \sum_{n=1}^{+\infty} z^{n-1} p_{n-1} + \mu \cdot
+\sum_{n=0}^{+\infty} z^n p_{n+1} \\
+  -\mu \cdot p_0 + (\lambda + \mu) \sum_{n=0}^{+\infty} p_n z^n &= \lambda
+\cdot z \cdot \sum_{n=1}^{+\infty} z^{n-1} p_{n-1} + \frac{\mu}{z} \cdot
+\sum_{n=0}^{+\infty} z^{n+1} p_{n+1} \\
+  -\mu \cdot p_0 + (\lambda + \mu) \sum_{n=0}^{+\infty} p_n z^n &= \lambda
+\cdot z \cdot \sum_{n=1}^{+\infty} z^{n-1} p_{n-1} + \frac{\mu}{z} \cdot
+\left[\sum_{n=0}^{+\infty} \left(z^{n} p_{n}\right) - p_0\right] \\
+  (\lambda + \mu) \cdot P(z) - \mu \cdot p_0 &= \lambda \cdot z \cdot P(z) +
+\frac{\mu}{z} \cdot [P(z) - p_0] \\
+  (\lambda + \mu) \cdot z \cdot P(z) - \mu \cdot z \cdot p_0 &= \lambda \cdot z^2
+\cdot P(z) + \mu \cdot [P(z) - p_0] \\
+  &\Downarrow \\
+  P(z) &= \frac{\mu \cdot p_0 \cdot (z - 1)}{-\lambda \cdot z^2 + (\lambda + \mu)
+\cdot z - \mu} \\
+  &= \frac{\mu \cdot p_0 \cdot (z - 1)}{\mu (z - 1) - \lambda \cdot z
+\cdot (z - 1)} \\
+  &= \frac{\mu \cdot p_0}{\mu - \lambda \cdot z} \\
+  &= \frac{p_0}{1 - \rho \cdot z}
+\end{align*}
+$$
+
+This means that $P(z)$ depends on $p_0$, which is still _unknown_.
+
+However, we can use the normalization condition which tells us that:
+
+$$
+P(1) := E[1^N] = \sum_{n=0}^{+\infty} 1^n p_n = \sum_{n=0}^{+\infty} p_n = 1
+$$
+
+Meaning that $p_0 = 1 - \rho$, and we get the final expression for the PGF:
+
+$$
+\Large
+\boxed{
+  P(z) = \frac{1 - \rho}{1 - \rho \cdot z}
+}
+$$
+
+> [!NOTE]
+> The above expression can be anti-transformed to get $p_k$:
+>
+> $$
+> \begin{CD}
+> {
+>   P(z) = \frac{1 - \rho}{1 - \rho \cdot z} = (1 - \rho) \cdot \sum_{k=0}^{+\infty}
+> \left(\rho \cdot z\right)^k
+> } @>>>
+> {
+>   p_k = (1- \rho) \cdot \rho^k
+> }
+> \end{CD}
+> $$
+
+Once we computed the PGF, we can calculate the indexes **without anti-transforming
+it**, but just by using PGF properties:
+
+- **Mean Number of Jobs**: $E[N] = \frac{d}{dz}P(z)\vert_{z=1} = \dots =
+  \frac{\rho}{1 - \rho}$&emsp; From this we can also compute $E[N_q], E[R]$ and
+  $E[W]$.
+- **Mean squared number of jobs**: $E[N^2] = \left[\frac{d^2}{dz^2}P(z) + \frac{d}{dz}P(z)\right]{z=1}$
+
+If needed, we can also compute some SS probabilities:
+
+$$
+\begin{align*}
+  p_0 &= \lim_{z\to 0} P(z) \\
+  p_k &= \frac{P^{(k)}(0)}{k!} = \frac{1}{k!} \cdot \frac{d^k}{dz^k}P(z)\Big\vert_{z=0}
+\end{align*}
+$$
+
+### 2.2.4. Arrival Time and Random Observer Probabilities
+
+The SS probabilities we discussed so far are those that a **random observer**
+would see. In other words, if anyone looks at the system at a random time
+(in the steady state), $p_n$ is **the probability that she will observe
+$n$ jobs in the system**.
+
+There is another important probability, which is the one **seen by any arriving
+job**. We can call it **_Arrival-Time Probability_** or **_Tagged-job SS
+Probability_**, and we denote it with $r_n$.
+
+Consider a queuing system with **constant** arrival time, equal to $2\;s$, and
+**constant service times** equal to $1\;s$ (a D/D/1 system). Such system
+is always in steady state.
+
+<figure class="">
+<img class="100" src="./images/qt/dd1-system-trajectory.png"
+      alt="D/D/1 system trajectory">
+<figcaption>
+
+A possible trajectory of the D/D/1 system.
+
+</figcaption>
+</figure>
+
+A **random observer** will observe:
+
+- **One job** in the system, half of the time
+- **Zero jobs** in the system, half of the time
+
+Hence $p_0 = p_1 = 0.5$
+
+However, an arriving job will **always find the system empty**, hence it is
+$r_0 = 1$ and $r_j = 0$ for $j > 0$.
+
+Therefore, in general, $r_n \ne p_n$.
+
+In (generic) birth-death system with _exponential inter-arrival times_, _arrival-time
+probabilities_ can be found using **Bayes' Theorem**:
+
+$$
+r_n(t) = \lim_{\Delta t \to 0} {P\Set{N(t) = n \vert A(t, t + \Delta t)}}
+$$
+
+Where $A(t, \Delta t)$ means that there is an arrival in the interval
+$[t, t + \Delta t)$.
+
+> [!NOTE]
+> With continuous RVs (such as arrival times), we cannot posit that anything
+> occurs "at" time $t$ with non-null probability.  
+> However, we can have it occur within an interval $[t, t + \Delta t)$, and then
+> let $\Delta t \to 0$
+
+From this definition, we can compute using Bayes' Theorem:
+
+$$
+\begin{align*}
+  r_n(t) &= \lim_{\Delta t \to 0} {P\Set{N(t) = n \vert A(t, t + \Delta t)}} \\
+  &= \lim_{\Delta t \to 0} \frac{P\Set{N(t) = n, A(t, t + \Delta t)}}
+{P\Set{A(t, t + \Delta t)}} \\
+&= \lim_{\Delta t \to 0} \frac{P\Set{A(t, t + \Delta t) \vert N(t) = n} \cdot
+P\Set{N(t) = n}}{\displaystyle\sum_{k=0}^{+\infty} P\Set{A(t, t + \Delta t)
+\vert N(t) = k} \cdot P\Set{N(t) = k}}
+\end{align*}
+$$
+
+Now, the probability that the next arrival occurs by $t + \Delta t$ when the system
+is in state $n$ is:
+
+$$
+P\Set{A(t, t + \Delta t) \vert N(t) = n} = 1 - e^{-\lambda_n \cdot \Delta t}
+$$
+
+However, since we are letting $\Delta t \to 0$, we can substitute the exponential
+with its **Taylor expansion**:
+
+$$
+e^{-\lambda_n \cdot \Delta t} = \sum_{j=0}^{+\infty} \frac{(-\lambda_n \cdot
+\Delta t)^j}{j!} = 1 - \lambda_n \cdot \Delta t + o(\Delta t)
+$$
+
+Hence:
+
+$$
+1 − e^{-\lambda_n \Delta t} = 1 − (1 − \lambda n \Delta t + o(\Delta t))
+= \lambda_n \Delta t + o(\Delta t)
+$$
+
+We can then substitute this result in the previous equation, and get:
+
+$$
+\begin{align*}
+  r_n(t) &= \lim_{\Delta t \to 0} \frac{P\Set{A(t, t + \Delta t) \vert N(t) = n}
+\cdot P\Set{N(t) = n}}{\displaystyle\sum_{k=0}^{+\infty} P\Set{A(t, t + \Delta t)
+\vert N(t) = k} \cdot P\Set{N(t) = k}} \\
+  &= \lim_{\Delta t \to 0} \frac{\left[\lambda_n + \frac{o(\Delta t)}{\Delta t}\right]
+  \cdot p_n(t)}{\displaystyle\sum_{k=0}^{+\infty} \left[\lambda_k +
+\frac{o(\Delta t)} {\Delta t}\right] \cdot p_k(t)} \\
+  &= \frac{\lambda_n \cdot p_n(t)}{\displaystyle\sum_{k=0}^{+\infty} \lambda_k
+\cdot p_k(t)}
+\end{align*}
+$$
+
+The above equalities hold $\forall t$, hence also the steady state, in which we
+get:
+
+$$
+r_n = \lim_{t \to +\infty} r_n(t) =
+\frac{\lambda_n\cdot p_n}{\displaystyle\sum_{k=0}^{+\infty}\lambda_k\cdot p_k} =
+\frac{\lambda_n}{\overline{\lambda}} \cdot p_n
+$$
+
+Where $\overline{\lambda}$ is the _mean arrival rate_.
+
+> [!NOTE]
+> Only when $\lambda_n = \lambda$ $\forall n$, we get that $r_n = p_n$.
+>
+> Systems where $r_n = p_n$ are said to posses the **PASTA property**
+> (_Poisson Arrivals See Time Average_).
+
+Tagged-job probabilities are useful to compute the **distribution** of the response
+and waiting times.
+
+### 2.2.5. Distribution of Response and Waiting Times
+
+Previously, we computed the **mean** response and waiting time $E[R], E[W]$ through
+_Little's Law_.
+
+We now show how to compute their **distribution** $F_R(x), F_W(x)$.
+
+#### 2.2.5.1. Response Time Distribution
+
+<div class="grid2">
+<div class="">
+
+Suppose a job arrives in the system at time $t$, with $n$ being the number of
+jobs _already present_ at time $t^-$.
+
+We already know that the probability of this event is $r_n$.
+
+Now, the time that the tagged job will have to spend in the system (i.e., its
+response time) is composed of:
+
+- The **residual service time** of the job being served at time $t$
+- The **sum of the service times** of all the other $n$ jobs, including
+  the tagged one.
+
+</div>
+<div class="">
+<img class="80" src="./images/qt/response-time-scheme.png"
+      alt="Response Time Scheme">
+</div>
+</div>
+
+However, since service times are **exponentially distributed** (hence _memoryless_),
+the **residual service time has _the same distribution_ as the service time**:
+
+$$
+P\Set{t_s > x + y \vert t_s > x} = P\Set{t_s > y}
+$$
+
+Therefore, the response time is **the sum of the services times of $n+1$ jobs**,
+**_if_** there are $n$ jobs at the time of arrival.
+
+The distribution of the sum of IID exponential is very common, and its called
+**_Erlang Distribution_**:
+
+$$
+\begin{align*}
+  F_n(t) &= 1 - \sum_{k=0}^{n-1}{e^{-\mu t} \frac{(\mu t)^k}{k!}} &&\text{CDF}\\
+  f_n(t) &= e^{-\mu t} \cdot \frac{\mu^n t^{n-1}}{(n-1)!} && \text{PDF}
+\end{align*}
+$$
+
+<img class="30" src="./images/qt/erlang-distribution.png"
+      alt="Erlang Distribution">
+
+When $n=1$ the Erlang distribution reduces to the exponential distribution, while
+when $n > 1$ it starts **peaking** and then going down, until it starts to look
+like a _Normal distribution_.
+
+We can compute $E[S_n]$ and $\operatorname*{Var}[S_n]$ leveraging **additivity**
+of mean values and **independence**:
+
+$$
+\begin{align*}
+  E[S_n] &= \sum_{i=1}^{n+1} E[t_s] = \frac{n + 1}{\mu} \\
+  \operatorname*{Var}[S_n] &= \sum_{i=1}^{n+1} \operatorname*{Var}[t_s] =
+  \frac{n + 1}{\mu^2} \\
+  \operatorname*{CoV}(S_n) &= \frac{\sqrt{\operatorname*{Var}[S_n]}}{E[S_n]}
+= \frac{1}{\sqrt{n}}
+\end{align*}
+$$
+
+In other words, the CoV of an $n$-stage Erlang is **smaller than one**, and
+gets smaller with $n$.
+
+We can now compute $f_R(t)$ using the **Total Probability Theorem**, knowing
+that the sum of $n + 1$ IID exponentials with a rate $\mu$ is an $(n + 1)$-stage
+Erlang distribution:
+
+$$
+\begin{align*}
+  f_R(t) &= \displaystyle\sum_{n=0}^{+\infty}{f_{n+1}(t) \cdot r_n} \\
+  &= \displaystyle\sum_{n=0}^{+\infty}{\mu \cdot e^{-\mu t} \cdot
+\frac{(\mu \cdot t)^n}{n!} \cdot (1 - \rho) \cdot \rho^n}\\
+  &= \mu \cdot (1 - \rho) \cdot e^{-\mu t} \cdot \displaystyle\sum_{n=0}^{+\infty}
+\frac{(\rho \cdot \mu \cdot t)^n}{n!} \\
+  &= \mu \cdot (1 - \rho) \cdot e^{-\mu t} \cdot e^{\rho \cdot \mu \cdot t} \\
+  &= \mu \cdot (1 - \rho) \cdot e^{-\mu \cdot (1 - \rho) \cdot t} \\
+  &= (\mu - \lambda) \cdot e^{-(\mu - \lambda) \cdot t} \\
+  &= \frac{1}{E[R]} \cdot e^{-\frac{t}{E[R]}}
+\end{align*}
+$$
+
+Which is **an exponential distribution**, with mean $E[R] = \frac{1}{\mu -
+\lambda}$.
+
+Hence:
+
+$$
+F_R(t) = 1 - e^{-\frac{t}{E[R]}} = 1 - e^{-(\mu - \lambda) \cdot t}
+$$
+
+When $\lambda \to 0$ (i.e., the system is empty), we get that
+this distribution is equal to the service time distribution, as expected.
+
+When $\lambda \to \mu$ (i.e., the system is saturated), we get that
+$f_R(t) \to 0 \cdot e^{-0^t} = 0\;\forall t$. This means that the
+_density_ of the response time will be flat to zero, resulting
+in an **unpredictable, but very long, response time**.
+
+#### 2.2.5.2 Waiting Time Distribution
+
+In a line of principle, we can use the same reasoning as for the _response time_,
+with care that when the system is **empty** at arrival, the waiting time
+is **zero**.
+
+This happens with a non-null probability, equal to the
+probability of finding the system empty $r_0 = 1 - \rho$.
+
+Therefore, the PDF of the waiting time will be:
+
+- **Zero**, with a non-null probability $r_0 = 1 - \rho$
+- **$n$-range Erlang Distribution** with a probability $r_n,\;n\ge 1$
+
+> [!NOTE]
+> The fact that $F_W(0) = P\Set{W = 0} = r_0 > 0$ means that there is a discontinuity
+> at $F_W(0)$.  
+> Thus, the PDF will have a **Dirac's delta** with area $1 - \rho$.
+
+We can once again use _Total Probability Theorem_ to compute $f_W(x)$:
+
+$$
+\begin{align*}
+  f_W(t) &= (1 - \rho) \cdot \delta(t) + \displaystyle\sum_{n=1}^{+\infty}
+{f_n(t) \cdot r_n} \\
+  &= (1 - \rho) \cdot \delta(t) + \displaystyle\sum_{n=1}^{+\infty}
+{\mu \cdot e^{-\mu t} \cdot \frac{(\mu \cdot t)^{n-1}}{(n-1)!} \cdot (1 - \rho)
+\cdot \rho^n} \\
+  &= (1 - \rho) \cdot \delta(t) + \mu e^{-\mu t} \cdot (1 - \rho) \cdot \rho \cdot
+\displaystyle\sum_{n=1}^{+\infty} \frac{(\mu \cdot t)^{n-1}}{(n-1)!} \cdot
+\rho^{n-1} \\
+  &= (1 - \rho) \cdot \delta(t) + \rho \cdot \mu \cdot (1 - \rho) \cdot
+e^{-\mu (1 - \rho) t} \\
+  &= (1 - \rho) \cdot \delta(t) + \rho \cdot \frac{1}{E[R]} \cdot e^{-\frac{t}{E[R]}}
+\end{align*}
+$$
+
+From the above we can easily compute the distribution $F_W(t)$:
+
+$$
+  F_W(t) = \begin{cases}
+    0 & t < 0 \\
+    1 - \rho  & t = 0 \\
+    (1 - \rho) + \rho \cdot (1 - e^{-\frac{t}{E[R]}}) & t \ge 0
+\end{cases} = 1 - \rho \cdot e^{-\frac{t}{E[R]}} \quad t \ge 0
+$$
+
+<img class="" src="./images/qt/waiting-time-distribution.png"
+      alt="Waiting Time Distribution">
+
+Having the distributions, means that we can solve problems with **percentile
+constraints**. In fact, selecting the speed so that the $95^{th}$ percentile
+of the response/waiting time is below $x$, just needs us to solve
+$F_R(x) = 0.95$ or $F_W(x) = 0.95$, and obtain $x$ as a solution.
+
+#### 2.2.5.3. Exercise: Doubling Website Rate of Contacts
+
+> Our boss says that the rate of contacts to our company’s website is
+> going to double next month.  
+> She wants us to add more capacity to it, so that:
+>
+> a) The mean response time will remain the same;  
+> b) The $99^{th}$ percentile of the response time will remain the same.
+
+Assuming our web server can be modeled via an M/M/1 system, this boils down to
+**increasing its service rate** to match the requirements.
+
+Let's call $\lambda, \mu$ the _current arrival rate_ and _current service rate_
+of the website. We can denote the new arrival rate as $\lambda' = 2 \lambda$
+and $\mu'$ the new service rate.
+
+To keep mean response time constant (i.e., the first requirement):
+
+$$
+\begin{align*}
+  E[R'] &= E[R] \\
+\frac{1}{\mu' - 2\lambda} &= \frac{1}{\mu - \lambda} \\
+\mu' &= \mu + \lambda
+\end{align*}
+$$
+
+In the second case, we have to consider that $F_R(x) = 1 - e^{-(\mu - \lambda)
+\cdot x}$ and that the $99^{th}$ percentile of the _current_ response time is
+the solution $x_{.01}$ to:
+
+$$
+\begin{align*}
+  F_R(x_{.01}) &= 0.99 \\
+  1 - e^{-(\mu - \lambda) \cdot x_{.01}} &= 0.99 \\
+  e^{-(\mu - \lambda) \cdot x_{.01}} &= \frac{1}{100} \\
+  x_{.01} &= \frac{\ln{100}}{\mu - \lambda}
+\end{align*}
+$$
+
+In the _new_ configuration, the $99^{th}$ percentile will be $x'_{.01}$,
+solution to:
+
+$$
+\begin{CD}
+{
+x_{.01}' = \frac{\ln{100}}{\mu' - 2\lambda}
+}
+@>>>
+{
+  \mu' = \mu + \lambda
+}
+\end{CD}
+$$
+
+This means, that the solution for both problem is the same: **increasing $\mu$
+by $\lambda$**.
+
+> [!NOTE]
+> We can notice that if we had put _any percentile_ to be kept the same, the answer
+> would still have been $\mu' = \mu + \lambda$.  
+> Instead, had we used $\mu' = 2 \mu$ (as the boss might have thought), we would
+> have **halved the mean response time**, going well over the requirements (and
+> probably the budget).

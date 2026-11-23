@@ -77,7 +77,8 @@ Requirements for the course are:
 1. [Confidence Intervals](./Confidence%20Intervals)
 1. [Model Fitting](./Model%20Fitting)
 1. [Design of Experiments](./Design%20of%20Experiments)
-1. [Queuing Theory](./Queuing%20Theory)
+1. [Queuing Theory - MM1 Systems](./Queuing%20Theory%20-%20MM1%20Systems)
+1. [Queuing Theory - MMC Systems](./Queuing%20Theory%20-%20MMC%20Systems)
 
 ### Simulations (Nardini)
 
