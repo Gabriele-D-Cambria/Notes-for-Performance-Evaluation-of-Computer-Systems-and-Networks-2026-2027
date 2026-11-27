@@ -1,5 +1,5 @@
 ---
-title: Queuing Theory - MMC Systems
+title: Queuing Theory - MMC and MM1K Systems
 ---
 
 # 1. Index
@@ -17,13 +17,14 @@ title: Queuing Theory - MMC Systems
 - [4. MM1K Systems](#4-mm1k-systems)
   - [4.1. Non Trivial Performance Indexes](#41-non-trivial-performance-indexes)
   - [4.2. Adding Queuing Space](#42-adding-queuing-space)
-- [5. Finite Population Systems](#5-finite-population-systems)
-<!--toc:end-->
+  <!--toc:end-->
 
 # 2. Queuing Theory
 
-In this section we will discuss **M/M/C systems**, which are a generalization
-of what we discussed [in the previous chapter about M/M/1 systems](./Queuing%20Theory%20-%20MM1%20Systems).
+In this section we will discuss **M/M/C and M/M/1/K Systems**,
+as a continuation of what seen before:
+
+1. [MM1 Systems](./Queuing%20Theory%20-%20MM1%20Systems)
 
 > [!IMPORTANT]
 > This chapter will make usage of many concepts we discussed in the previous chapter,
@@ -738,123 +739,3 @@ not a problem**.
 
 If this is not the case, our main concern should be to add buffer space until
 the probability of losing a job is small enough.
-
-# 5. Finite Population Systems
-
-We indicate **infinite-queue finite-population systems** as **M/M/1/\*/U**.
-
-<img class="20" src="./images/qt/mm1u-system.png"
-      alt="M/M/1/*/U System">
-
-Typical examples are:
-
-- A repair center for broken machines. Once fixed, machines are put back in
-  operation, and broken ones are queued for repair.
-  The overall population of machines is a constant $U$
-- An I/O device being accessed by a finite number of processes.
-- A network switch having $U$ input lines that **block** when they are being served.
-
-Assuming that users are **independent**, and that the time a user spends **outside**
-the system is _exponentially distributed_ with a rate $\lambda$.
-
-Then, it follows that, if $U$ users are the population and $n$ users are inside
-the system at time $t$, $U -n$ will be outside the system and may be entering the
-system in the future.
-
-Therefore, the next arrival will occur when the **smallest (residual) "outside"
-time will have elapsed**.
-
-However, given that outside times are IID exponentials:
-
-1. _Residual outside times_ are distributed as _outside times_ (_memoryless_ property).
-1. The minimum of $U - n$ IID exponentials is an exponential with a rate $(U -n)
-\cdot \lambda$
-
-Therefore, **the arrival rates are**
-
-$$
-\lambda n = (U - n) \cdot \lambda
-$$
-
-On the other hand, if we have only a constant-rate server, the service rates
-are constant $(\mu_n = \mu)$ , and the system will have $U + 1$ states.
-
-Hence, as long as its memory is at least equal to $U$, it does not really
-matter how large it is.
-
-This said, the CTMC is the following:
-
-<img class="" src="./images/qt/mm1u-system-ctmc.png"
-      alt="M/M/1/*/U System">
-
-Having a finite number of states, the system is **always stable**, and the
-equilibrium equations are:
-
-<div class="grid2">
-<div class="top">
-<p class="subt"> Global Equilibrium Equations </p>
-
-$$
-\begin{align*}
-  U \cdot \lambda \cdot p_0 &= \mu \cdot p_1 && \\
-  [(U - n) \cdot \lambda + \mu] \cdot p_n &= (U - n + 1) \cdot \lambda \cdot
-p_{n-1} + \mu \cdot p_{n+1} && 1 \le n \le U - 1 \\
-   \mu \cdot p_U &= \lambda \cdot p_{U-1} &&
-\end{align*}
-$$
-
-</div>
-<div class="top">
-<p class="subt"> Local Equilibrium Equations </p>
-
-$$
-(U - n) \cdot \lambda \cdot p_n = \mu \cdot p_{n+1}, \quad 0 \le n \le U - 1
-$$
-
-</div>
-</div>
-
-From the local equilibrium equations we can easily compute the SS probabilities:
-
-$$
-p_n = \left(\frac{\lambda}{\mu}\right)^n \cdot \frac{U!}{(U - n)!} \cdot p_0, \quad
-0 \le n \le U
-$$
-
-The system is always stable, hence we can compute $p_0$ from the normalization condition:
-
-$$
-\begin{CD}
-{
-  p_0 \cdot \sum_{n=0}^{U} \left(\frac{\lambda}{\mu}\right)^n \cdot
-\frac{U!}{(U - n)!} = 1
-} \\
-@VVV \\
-{
-  p_0 = \frac{1}{\displaystyle\sum_{n=0}^{U} \left(\frac{\lambda}{\mu}\right)^n
-\cdot \frac{U!}{(U - n)!}}
-}
-\end{CD}
-$$
-
-We can compute the performance indexes:
-
-$$
-\begin{align*}
-  E[N] &= \sum_{n=0}^{U} n \cdot p_n = \sum_{n=0}^{U} (U - (U-n)) \cdot p_n \\
-    &= \sum_{n=0}^{U} U \cdot p_n - \sum_{n=0}^{U} (U-n) \cdot p_n \\
-    &= U - \sum_{n=0}^{U-1} (U-n) \cdot \left(\frac{\lambda}{\mu}\right)^n
-\cdot \frac{U!}{(U - n)!} \cdot p_0 \\
-    &= U - \sum_{n=0}^{U-1} \left(\frac{\lambda}{\mu}\right)^n \cdot
-\frac{U!}{(U - (n + 1)!} \cdot p_0 \\
-    &= U - \frac{\mu}{\lambda} \cdot \sum_{j=1}^{U} \left(\frac{\lambda}{\mu}\right)^j \cdot
-  \frac{U!}{(U - j)!} \cdot p_0 \\
-    &= U - \frac{\mu}{\lambda} \cdot (1 - p_0) \\
-\end{align*}
-$$
-
-From this we easily get the _Mean Number of Jobs in the Queue_ as:
-
-$$
-E[N_q] = E[N] - (1 - p_0) = U - \frac{\mu + \lambda}{\lambda} \cdot (1 - p_0)
-$$

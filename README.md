@@ -78,7 +78,8 @@ Requirements for the course are:
 1. [Model Fitting](./Model%20Fitting)
 1. [Design of Experiments](./Design%20of%20Experiments)
 1. [Queuing Theory - MM1 Systems](./Queuing%20Theory%20-%20MM1%20Systems)
-1. [Queuing Theory - MMC Systems](./Queuing%20Theory%20-%20MMC%20Systems)
+1. [Queuing Theory - MMC and MM1K Systems](./Queuing%20Theory%20-%20MMC%20and%20MM1K%20Systems)
+1. [Queuing Theory - Finite Population and Bulk Arrival Systems](./Queuing%20Theory%20-%20Finite%20Population%20and%20Bulk%20Arrival%20Systems)
 
 ### Simulations (Nardini)
 
